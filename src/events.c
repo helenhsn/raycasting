@@ -8,7 +8,11 @@
 #include "events.h"
 #include "geometry.h"
 
-static SDL_linked_event *chain_events = NULL;
+static SDL_linked_event *chain_events           = NULL;
+bool first_button_down                          = true;
+static SDL_Point start_point;
+static SDL_Point end_point;
+SDL_Scancode drawing_type = SDL_SCANCODE_R;
 
 void bind_event(SDL_EventType event_type, SDL_callback callback, void *param)
 {
@@ -49,9 +53,19 @@ void unbind_event(SDL_EventType event_type, SDL_callback callback, void *param)
 }
 void callback_release(SDL_Event event, SDL_Renderer *renderer, void *param)
 {
-    if (((int) param & SDL_BUTTON_LMASK) != 0)
-        unbind_event(SDL_MOUSEMOTION, add_rect_to_list, NULL);
-    unbind_event(SDL_MOUSEBUTTONUP, callback_release, param);
+    if (((*(int *) param) & SDL_BUTTON_LMASK) != 0)
+    {
+            if (drawing_type == SDL_SCANCODE_R)
+                    unbind_event(SDL_MOUSEMOTION, add_rect_to_list, NULL);
+            else
+            {
+                    if (!first_button_down)
+                    {
+                            unbind_event(SDL_MOUSEBUTTONDOWN, add_edge_to_list, &start_point);
+                    }
+            }
+            unbind_event(SDL_MOUSEBUTTONUP, callback_release, param);
+    }
 }
 
 void push_button_callback(SDL_Event event, SDL_Renderer *renderer, void *param)
@@ -61,16 +75,46 @@ void push_button_callback(SDL_Event event, SDL_Renderer *renderer, void *param)
     SDL_Log("Mouse button is pressed at %u %u", mouse_pos.x, mouse_pos.y);
 
     if ( (button_pressed & SDL_BUTTON_LMASK) != 0 )
-        add_rect_to_list(event, renderer, param);
-    bind_event(SDL_MOUSEMOTION, add_rect_to_list, NULL);
+    {
+            if (drawing_type == SDL_SCANCODE_R) //current drawing = rect
+            {
+                    fprintf(stderr, "ok1");
+                    add_rect_to_list(event, renderer, param);
+                    bind_event(SDL_MOUSEMOTION, add_rect_to_list, NULL);
+            }
+            else //current drawing = line
+            {
+                if (first_button_down)
+                {
+                        fprintf(stderr, "ok2");
+                        start_point = mouse_pos;
+                        first_button_down = false;
+                }
+                else
+                {
+                        fprintf(stderr, "ok3");
+                        end_point = mouse_pos;
+                        first_button_down = true;
+                        SDL_edge edge_to_draw = {start_point, end_point};
+                        add_edge_to_list(event, renderer, &edge_to_draw);
+                }
+            }
 
-    bind_event(SDL_MOUSEBUTTONUP, callback_release, button_pressed);
+    }
+
+    bind_event(SDL_MOUSEBUTTONUP, callback_release, &button_pressed);
 }
 
-void quit_callback(SDL_Event event, SDL_Renderer *renderer, void *param)
+void keydown_callback(SDL_Event event, SDL_Renderer *renderer, void *param)
 {
-    if (event.key.keysym.sym == SDLK_ESCAPE)
+    SDL_Scancode key_pressed = event.key.keysym.scancode;
+    if (key_pressed == SDL_SCANCODE_ESCAPE)
         QUIT = true;
+    if (key_pressed == SDL_SCANCODE_R || key_pressed == SDL_SCANCODE_L)
+    {
+            fprintf(stderr, "\nkey selected : %i (15 : L / 21 : R)", key_pressed);
+            drawing_type = key_pressed;
+    }
 }
 
 void handle_event(SDL_Event event, SDL_Renderer *rend)

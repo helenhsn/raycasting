@@ -19,7 +19,11 @@ void update_window(SDL_Renderer *rend)
     {
         SDL_Event current_event;
         while (SDL_PollEvent(&current_event))
-            handle_event(current_event, rend);
+        {
+                if (current_event.type == SDL_MOUSEBUTTONDOWN)
+                        fprintf(stderr, "\nbuttondown");
+                handle_event(current_event, rend);
+        }
         SDL_RenderPresent(rend);
 
     }
@@ -52,7 +56,7 @@ int main()
 
     //bind initial events
     bind_event(SDL_MOUSEBUTTONDOWN, push_button_callback, NULL);
-    bind_event(SDL_KEYDOWN, quit_callback, NULL);
+    bind_event(SDL_KEYDOWN, keydown_callback, NULL);
 
     //window update loop
     update_window(renderer);
@@ -65,7 +69,7 @@ int main()
     }
 
     unbind_event(SDL_MOUSEBUTTONDOWN, push_button_callback, NULL);
-    unbind_event(SDL_KEYDOWN, quit_callback, NULL);
+    unbind_event(SDL_KEYDOWN, keydown_callback, NULL);
 
     SDL_DestroyWindow(window);
     SDL_Quit();

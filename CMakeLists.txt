@@ -5,7 +5,7 @@ set(CMAKE_C_STANDARD 99)
 find_package(SDL2 REQUIRED)
 
 include_directories(include)
-file(GLOB SOURCES "src/*c")
+file(GLOB SRC "src/*c")
 
-add_executable(raycasting ${SOURCES})
+add_executable(raycasting ${SRC})
 target_link_libraries(raycasting ${SDL2_LIBRARIES})

@@ -1,12 +1,16 @@
 # ninja log v5
-0	48	1661093785193368549	raycasting	4bb1ad508f2fee57
-0	11	1661093793937185857	build.ninja	35e68d38a5bce3bf
-0	128	1661093710555103390	CMakeFiles/raycasting.dir/src/main.c.o	ac73d3687002c9ef
+124	154	1661203077007135722	raycasting	fb69b46d39aa834d
+0	11	1661168389859629859	build.ninja	35e68d38a5bce3bf
+0	124	1661201983369638162	CMakeFiles/raycasting.dir/src/geometry.c.o	a19e870a38d5d5d5
+0	124	1661203076971141975	CMakeFiles/raycasting.dir/src/main.c.o	ac73d3687002c9ef
 1	120	1661086836102055721	CMakeFiles/raycasting.dir/edge.c.o	96fa7405109e4186
 1	122	1661086836106055664	CMakeFiles/raycasting.dir/events.c.o	ed26ad9136dd67ac
 0	126	1661093710551103493	CMakeFiles/raycasting.dir/src/geometry_tools.c.o	be900c30476506f1
-0	131	1661093710559103288	CMakeFiles/raycasting.dir/src/events.c.o	9ded76cc48d4b696
+0	119	1661202178887659855	CMakeFiles/raycasting.dir/src/events.c.o	9ded76cc48d4b696
+0	1	0	clean	1f2a816a449f8885
 0	129	1661086813038376904	CMakeFiles/raycasting.dir/main.c.o	9fbc77cf1552dfa9
 1	127	1661086813034376959	CMakeFiles/raycasting.dir/ray.c.o	b7796a8c5f4350f
 0	122	1661093770229690420	CMakeFiles/raycasting.dir/src/edge.c.o	a35b403e7910fb6b
 1	121	1661091579250310589	CMakeFiles/raycasting.dir/src/ray.c.o	3aa1041ce86dd19b
+0	128	1661203396261036607	CMakeFiles/raycasting.dir/src/events.c.o	9ded76cc48d4b696
+128	159	1661203396297035102	raycasting	fb69b46d39aa834d

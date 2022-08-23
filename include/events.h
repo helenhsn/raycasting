@@ -13,7 +13,7 @@
  * Structures used for events handling in the main file
  * */
 
-typedef bool (*SDL_callback) (SDL_Event event, SDL_Renderer *renderer, void* param);
+typedef void (*SDL_callback) (SDL_Event event, SDL_Renderer *renderer, void* param);
 
 typedef struct SDL_linked_event
 {
@@ -30,6 +30,7 @@ typedef struct SDL_linked_event
 
 extern bool QUIT;
 
+extern bool first_button_down;
 
 /*
  * Functions & callbacks used for events handling
@@ -43,7 +44,7 @@ extern void callback_release(SDL_Event event, SDL_Renderer *renderer, void *para
 
 extern void push_button_callback(SDL_Event event, SDL_Renderer *renderer, void *param);
 
-extern void quit_callback(SDL_Event event, SDL_Renderer *renderer, void *param);
+extern void keydown_callback(SDL_Event event, SDL_Renderer *renderer, void *param);
 
 extern void handle_event(SDL_Event event, SDL_Renderer *rend);
 
