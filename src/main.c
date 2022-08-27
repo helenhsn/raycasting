@@ -52,7 +52,7 @@ int main()
     SDL_RenderClear(renderer); //clear window
 
     //color of the rects
-    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
 
     //bind initial events
     bind_event(SDL_MOUSEBUTTONDOWN, push_button_callback, NULL);
@@ -71,6 +71,8 @@ int main()
     unbind_event(SDL_MOUSEBUTTONDOWN, push_button_callback, NULL);
     unbind_event(SDL_KEYDOWN, keydown_callback, NULL);
 
+    app_free();
+    SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
     return EXIT_SUCCESS;

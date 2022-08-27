@@ -26,14 +26,18 @@ typedef struct SDL_edge
 
 typedef struct SDL_ray
 {
-    SDL_Point point;
+    SDL_Point start_point;
     SDL_vector2D direction;
 } SDL_ray ;
 
-typedef struct SDL_linked_drawing
+typedef union SDL_drawing_type
 {
     SDL_Rect rect;
     SDL_edge edge;
+} SDL_drawing_type;
+typedef struct SDL_linked_drawing
+{
+    SDL_drawing_type drawing;
     struct SDL_linked_drawing *next;
 } SDL_linked_drawing;
 
@@ -44,10 +48,17 @@ typedef struct SDL_linked_drawing
 
 extern SDL_Point mouse_pos;
 extern SDL_Scancode drawing_type;
+extern SDL_linked_drawing *chain_drawings;
+extern SDL_ray *rays_array;
+extern bool CASTING_RAYS;
 
 /*
  * Functions for rectangles & edges
  * */
+
+extern void update_rays();
+
+void is_ray_intersect_edge(SDL_edge edge, SDL_ray ray);
 
 extern void add_rect_to_list(SDL_Event event, SDL_Renderer *renderer, void *user_param);
 
@@ -55,6 +66,7 @@ extern void add_edge_to_list(SDL_Event event, SDL_Renderer *renderer, void *user
 
 extern void draw_chain(SDL_Renderer *rend);
 
-extern bool is_ray_intersect_edge(SDL_edge edge, SDL_ray ray);
+extern void free_chain_drawings();
+
 
 #endif //RAYCASTING_GEOMETRY_H

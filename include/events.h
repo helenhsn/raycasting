@@ -44,6 +44,10 @@ extern void callback_release(SDL_Event event, SDL_Renderer *renderer, void *para
 
 extern void push_button_callback(SDL_Event event, SDL_Renderer *renderer, void *param);
 
+extern void app_free();
+
+static void app_quit();
+
 extern void keydown_callback(SDL_Event event, SDL_Renderer *renderer, void *param);
 
 extern void handle_event(SDL_Event event, SDL_Renderer *rend);
