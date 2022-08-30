@@ -70,6 +70,13 @@ build CMakeFiles/raycasting.dir/src/main.c.o: C_COMPILER__raycasting_Debug /home
   OBJECT_DIR = CMakeFiles/raycasting.dir
   OBJECT_FILE_DIR = CMakeFiles/raycasting.dir/src
 
+build CMakeFiles/raycasting.dir/src/render.c.o: C_COMPILER__raycasting_Debug /home/helen/Documents/GIT/raycasting/src/render.c || cmake_object_order_depends_target_raycasting
+  DEP_FILE = CMakeFiles/raycasting.dir/src/render.c.o.d
+  FLAGS = -g -std=gnu99
+  INCLUDES = -I/home/helen/Documents/GIT/raycasting/include
+  OBJECT_DIR = CMakeFiles/raycasting.dir
+  OBJECT_FILE_DIR = CMakeFiles/raycasting.dir/src
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target raycasting
@@ -78,9 +85,9 @@ build CMakeFiles/raycasting.dir/src/main.c.o: C_COMPILER__raycasting_Debug /home
 #############################################
 # Link the executable raycasting
 
-build raycasting: C_EXECUTABLE_LINKER__raycasting_Debug CMakeFiles/raycasting.dir/src/events.c.o CMakeFiles/raycasting.dir/src/geometry.c.o CMakeFiles/raycasting.dir/src/main.c.o
+build raycasting: C_EXECUTABLE_LINKER__raycasting_Debug CMakeFiles/raycasting.dir/src/events.c.o CMakeFiles/raycasting.dir/src/geometry.c.o CMakeFiles/raycasting.dir/src/main.c.o CMakeFiles/raycasting.dir/src/render.c.o
   FLAGS = -g
-  LINK_LIBRARIES = -L/usr/lib/x86_64-linux-gnu  -lSDL2
+  LINK_LIBRARIES = -L/usr/lib/x86_64-linux-gnu  -lSDL2  -lm
   OBJECT_DIR = CMakeFiles/raycasting.dir
   POST_BUILD = :
   PRE_LINK = :

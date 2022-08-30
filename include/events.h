@@ -13,7 +13,7 @@
  * Structures used for events handling in the main file
  * */
 
-typedef void (*SDL_callback) (SDL_Event event, SDL_Renderer *renderer, void* param);
+typedef void (*SDL_callback) (SDL_Event *event, SDL_Renderer *renderer, void* param);
 
 typedef struct SDL_linked_event
 {
@@ -40,15 +40,13 @@ extern void bind_event(SDL_EventType event_type, SDL_callback callback, void *pa
 
 extern void unbind_event(SDL_EventType event_type, SDL_callback callback, void *param);
 
-extern void callback_release(SDL_Event event, SDL_Renderer *renderer, void *param);
+extern void callback_release(SDL_Event *event, SDL_Renderer *renderer, void *param);
 
-extern void push_button_callback(SDL_Event event, SDL_Renderer *renderer, void *param);
+extern void push_button_callback(SDL_Event *event, SDL_Renderer *renderer, void *param);
 
-extern void app_free();
+extern void free_chain_events();
 
-static void app_quit();
-
-extern void keydown_callback(SDL_Event event, SDL_Renderer *renderer, void *param);
+extern void keydown_callback(SDL_Event *event, SDL_Renderer *renderer, void *param);
 
 extern void handle_event(SDL_Event event, SDL_Renderer *rend);
 

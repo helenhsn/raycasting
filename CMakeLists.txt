@@ -7,5 +7,6 @@ find_package(SDL2 REQUIRED)
 include_directories(include)
 file(GLOB SRC "src/*c")
 
-add_executable(raycasting ${SRC})
+add_executable(raycasting ${SRC} src/render.c include/render.h)
 target_link_libraries(raycasting ${SDL2_LIBRARIES})
+target_link_libraries(raycasting m)

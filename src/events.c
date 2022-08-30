@@ -7,15 +7,17 @@
 #include <SDL2/SDL.h>
 #include "events.h"
 #include "geometry.h"
+#include "render.h"
+
 
 static Uint32 button_pressed;
 static SDL_linked_event *chain_events           = NULL;
 bool first_button_down                          = true;
 static SDL_Point start_point;
 static SDL_Point end_point;
-SDL_Scancode drawing_type = SDL_SCANCODE_D;
+SDL_Scancode drawing_type = SDL_SCANCODE_E;
 
-static void free_chain_events()
+void free_chain_events()
 {
         SDL_linked_event *current_event = chain_events;
         while (current_event)
@@ -29,16 +31,7 @@ static void free_chain_events()
 }
 
 
-void app_free()
-{
-        free_chain_events();
-        free_chain_drawings();
-}
 
-void app_quit()
-{
-        QUIT=true;
-}
 
 void bind_event(SDL_EventType event_type, SDL_callback callback, void *param)
 {
@@ -78,17 +71,17 @@ void unbind_event(SDL_EventType event_type, SDL_callback callback, void *param)
 
 
 }
-void callback_release(SDL_Event event, SDL_Renderer *renderer, void *param)
+void callback_release(SDL_Event *event, SDL_Renderer *renderer, void *param)
 {
     if ( (button_pressed & SDL_BUTTON_LMASK) != 0)
     {
-            if (drawing_type == SDL_SCANCODE_E)
+            if (drawing_type == SDL_SCANCODE_R)
                     unbind_event(SDL_MOUSEMOTION, add_rect_to_list, NULL);
             unbind_event(SDL_MOUSEBUTTONUP, callback_release, NULL);
     }
 }
 
-void push_button_callback(SDL_Event event, SDL_Renderer *renderer, void *param)
+void push_button_callback(SDL_Event *event, SDL_Renderer *renderer, void *param)
 {
 
     button_pressed = SDL_GetMouseState(&mouse_pos.x, &mouse_pos.y);
@@ -96,7 +89,7 @@ void push_button_callback(SDL_Event event, SDL_Renderer *renderer, void *param)
 
     if ( (button_pressed & SDL_BUTTON_LMASK) != 0 )
     {
-            if (drawing_type == SDL_SCANCODE_E) //rects = eraser
+            if (drawing_type == SDL_SCANCODE_R) //rects = eraser
             {
                     fprintf(stderr, "ok1");
                     add_rect_to_list(event, renderer, param);
@@ -106,13 +99,11 @@ void push_button_callback(SDL_Event event, SDL_Renderer *renderer, void *param)
             {
                 if (first_button_down)
                 {
-                        fprintf(stderr, "ok2");
                         start_point = mouse_pos;
                         first_button_down = false;
                 }
                 else
                 {
-                        fprintf(stderr, "ok3");
                         end_point = mouse_pos;
                         first_button_down = true;
                         SDL_edge edge_to_draw = {start_point, end_point};
@@ -123,29 +114,41 @@ void push_button_callback(SDL_Event event, SDL_Renderer *renderer, void *param)
     bind_event(SDL_MOUSEBUTTONUP, callback_release, NULL);
 }
 
-static void change_color(SDL_Renderer *renderer, Uint8 r, Uint8 g, Uint8 b,
-                   Uint8 a)
-{
-        free_chain_drawings();
-        SDL_SetRenderDrawColor(renderer, r, g, b, a);
-}
 
-void keydown_callback(SDL_Event event, SDL_Renderer *renderer, void *param)
+void keydown_callback(SDL_Event *event, SDL_Renderer *renderer, void *param)
 {
-    SDL_Scancode key_pressed = event.key.keysym.scancode;
+    SDL_Scancode key_pressed = (*event).key.keysym.scancode;
     if (key_pressed == SDL_SCANCODE_ESCAPE)
-        app_quit();
+        QUIT = true;
 
-    if (key_pressed == SDL_SCANCODE_C) // C : casts rays
-            CASTING_RAYS = true;
-
-    if (key_pressed != drawing_type) // D : draws / E : erase :-)
+    else if (key_pressed == SDL_SCANCODE_L) // L : casts rays (light!)
     {
-            if ((key_pressed == SDL_SCANCODE_D)&&(drawing_type == SDL_SCANCODE_E))
-                    change_color(renderer, 255, 0, 0, 255);
-            if ((key_pressed == SDL_SCANCODE_E)&&(drawing_type==SDL_SCANCODE_D)) //we don't want both types of drawings on the screen
-                    change_color(renderer, 0, 0, 0, 255);
-            fprintf(stderr, "\nkey selected : %i (8 : E / 7 : D)", key_pressed);
+            if (!CASTING_RAYS) //first time key pressed : turn on lights
+            {
+                    CASTING_RAYS = true;
+                    init_rays();
+                    render_rays(NULL, renderer, NULL);
+                    bind_event(SDL_MOUSEMOTION, render_rays, NULL);
+            }
+            else //second time key pressed : turn off lights
+            {
+                    CASTING_RAYS = false;
+                    unbind_event(SDL_MOUSEMOTION, render_rays, NULL);
+            }
+    }
+
+    else if (key_pressed == SDL_SCANCODE_C)// C : clears drawings
+    {
+        free_chain_drawings();
+        //init_drawing
+        fprintf(stderr, "\n pbbb  ??? \n");
+        return;
+    }
+
+    else if (key_pressed != drawing_type) // E : edges / R : rects :-)
+    {
+            free_chain_drawings();
+            fprintf(stderr, "\nkey selected : %i (8 : E / 7 : D / 6 : C)", key_pressed);
             drawing_type = key_pressed;
     }
 
@@ -157,12 +160,7 @@ void handle_event(SDL_Event event, SDL_Renderer *rend)
         while ((current_linked_event)&&(!QUIT))
         {
                 if (current_linked_event->type == event.type)
-                {
-                        if (current_linked_event->type == SDL_MOUSEBUTTONDOWN)
-                                fprintf(stderr, "\nbuttondown in handle event");
-                        current_linked_event->callback(event, rend, current_linked_event->param);
-                }
-
+                        current_linked_event->callback(&event, rend, current_linked_event->param);
         current_linked_event = current_linked_event->next;
         }
 

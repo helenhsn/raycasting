@@ -7,6 +7,7 @@
 
 
 #include <SDL2/SDL.h>
+#include <stdbool.h>
 
 /*
  * Elements to display on the screen
@@ -27,6 +28,7 @@ typedef struct SDL_edge
 typedef struct SDL_ray
 {
     SDL_Point start_point;
+    SDL_Point end_point; //used for rendering
     SDL_vector2D direction;
 } SDL_ray ;
 
@@ -56,15 +58,14 @@ extern bool CASTING_RAYS;
  * Functions for rectangles & edges
  * */
 
-extern void update_rays();
+extern int distance(SDL_Point pt1, SDL_Point pt2);
 
-void is_ray_intersect_edge(SDL_edge edge, SDL_ray ray);
+extern SDL_Point *is_ray_intersect_edge(SDL_edge edge, SDL_ray ray);
 
-extern void add_rect_to_list(SDL_Event event, SDL_Renderer *renderer, void *user_param);
+extern void add_rect_to_list(SDL_Event *event, SDL_Renderer *renderer, void *user_param);
 
-extern void add_edge_to_list(SDL_Event event, SDL_Renderer *renderer, void *user_param);
+extern void add_edge_to_list(SDL_Event *event, SDL_Renderer *renderer, void *user_param);
 
-extern void draw_chain(SDL_Renderer *rend);
 
 extern void free_chain_drawings();
 
