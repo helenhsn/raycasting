@@ -8,20 +8,21 @@
 
 int w_width = 1000;
 int w_height = 800;
+int nb_ray = 8;
 
 void init_rays()
 {
         fprintf(stderr, "entering init rays");
-        rays_array = calloc(360, sizeof(SDL_ray));
-        for (uint32_t i = 0; i < 4; i++)
+        rays_array = calloc(nb_ray, sizeof(SDL_ray));
+        for (int32_t i = 0; i < nb_ray; i++)
         {
                 if (i==3)
                         fprintf(stderr, "\ninitrays last ray");
                 rays_array[i].start_point = mouse_pos;
-                rays_array[i].direction.dx = i*M_PI/2;
-                rays_array[i].direction.dy = i*M_PI/2; //direction is a const for each ray
-                rays_array[i].end_point.x = mouse_pos.x + cos(i*M_PI/2);
-                rays_array[i].end_point.y = mouse_pos.y + sin(i*M_PI/2);
+                rays_array[i].direction.dx = -i*2*M_PI/nb_ray;
+                rays_array[i].direction.dy = -i*2*M_PI/nb_ray; //direction is a const for each ray
+                rays_array[i].end_point.x = (float) mouse_pos.x + cos(-i*2*M_PI/nb_ray);
+                rays_array[i].end_point.y = (float) mouse_pos.y + sin(-i*2*M_PI/nb_ray);
         }
 }
 
@@ -30,25 +31,29 @@ void render_rays(SDL_Event *event, SDL_Renderer *rend, void *param)
         if (drawing_type != SDL_SCANCODE_E)
                 return;
 
-        for (uint8_t i = 0; i < 4; i++)
+        for (int8_t i = 0; i < nb_ray; i++)
         {
-                fprintf(stderr, "NOUVEAU RAYON \n ----------------------- ");
+                fprintf(stderr, "\n\n -------- NOUVEAU RAYON  i : %u\n ----------------------- ", i);
 
                 rays_array[i].start_point = mouse_pos;
-                rays_array[i].end_point.x = mouse_pos.x + 50*cos(i*M_PI/2);
-                rays_array[i].end_point.y = mouse_pos.y + 50*sin(i*M_PI/2);
+                rays_array[i].end_point.x = (float)mouse_pos.x + cos(-i*2*M_PI/nb_ray);
+                rays_array[i].end_point.y = (float) mouse_pos.y + sin(-i*2*M_PI/nb_ray);
                 SDL_Point last_endpoint = {0,0};
-
-
                 SDL_linked_drawing *current_edge = chain_drawings;
 
+                if (i==5)
+                        fprintf(stderr, "allo");
                 while (current_edge)
                 {
                         SDL_Point *intersect_pt = is_ray_intersect_edge(current_edge->drawing.edge, rays_array[i]);
                         if ((intersect_pt)
                         &&((distance(mouse_pos, *intersect_pt) < distance(mouse_pos, last_endpoint))
                         || (last_endpoint.x == 0 && last_endpoint.y == 0)))
+                        {
+                                fprintf(stderr, "gnnnnnnnnnnnnnnnnnnnnnnnnnnn");
                                 last_endpoint = *intersect_pt;
+                        }
+
                         current_edge = current_edge->next;
                 }
 

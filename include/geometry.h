@@ -12,11 +12,10 @@
 /*
  * Elements to display on the screen
  * */
-
 typedef struct SDL_vector2D
 {
-    int dx;
-    int dy;
+    float dx;
+    float dy;
 } SDL_vector2D;
 
 typedef struct SDL_edge
@@ -28,7 +27,7 @@ typedef struct SDL_edge
 typedef struct SDL_ray
 {
     SDL_Point start_point;
-    SDL_Point end_point; //used for rendering
+    SDL_FPoint end_point; //used for rendering
     SDL_vector2D direction;
 } SDL_ray ;
 
