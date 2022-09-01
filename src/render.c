@@ -8,7 +8,7 @@
 
 int w_width = 1000;
 int w_height = 800;
-int nb_ray = 8;
+int nb_ray = 100;
 
 void init_rays()
 {
@@ -35,17 +35,21 @@ void render_rays(SDL_Event *event, SDL_Renderer *rend, void *param)
         {
                 fprintf(stderr, "\n\n -------- NOUVEAU RAYON  i : %u\n ----------------------- ", i);
 
+                /*
+                mouse_pos.x = 170;
+                mouse_pos.y = 132;
+                 */
                 rays_array[i].start_point = mouse_pos;
-                rays_array[i].end_point.x = (float)mouse_pos.x + cos(-i*2*M_PI/nb_ray);
+                rays_array[i].end_point.x = (float) mouse_pos.x + cos(-i*2*M_PI/nb_ray);
                 rays_array[i].end_point.y = (float) mouse_pos.y + sin(-i*2*M_PI/nb_ray);
-                SDL_Point last_endpoint = {0,0};
+                SDL_FPoint last_endpoint = {0,0};
                 SDL_linked_drawing *current_edge = chain_drawings;
 
-                if (i==5)
+                if (i==1)
                         fprintf(stderr, "allo");
                 while (current_edge)
                 {
-                        SDL_Point *intersect_pt = is_ray_intersect_edge(current_edge->drawing.edge, rays_array[i]);
+                        SDL_FPoint *intersect_pt = is_ray_intersect_edge(current_edge->drawing.edge, rays_array[i]);
                         if ((intersect_pt)
                         &&((distance(mouse_pos, *intersect_pt) < distance(mouse_pos, last_endpoint))
                         || (last_endpoint.x == 0 && last_endpoint.y == 0)))
@@ -57,8 +61,11 @@ void render_rays(SDL_Event *event, SDL_Renderer *rend, void *param)
                         current_edge = current_edge->next;
                 }
 
+                if (last_endpoint.x == 0 && last_endpoint.y == 0)
+                        fprintf(stderr, "pb");
+
                 //draw the endpoint with the smallest distance from the mouse (the other ones are stopped by the edge)
-                fprintf(stderr, "RAY CORRECTED :ending point : (%i, %i) \n", last_endpoint.x, last_endpoint.y);
+                fprintf(stderr, "RAY CORRECTED :ending point : (%f, %f) \n", last_endpoint.x, last_endpoint.y);
                 SDL_SetRenderDrawColor(rend, 255, 255, 255, 255);
                 SDL_RenderDrawLine(rend,
                                    rays_array[i].start_point.x,

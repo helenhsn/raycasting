@@ -57,9 +57,9 @@ extern bool CASTING_RAYS;
  * Functions for rectangles & edges
  * */
 
-extern int distance(SDL_Point pt1, SDL_Point pt2);
+extern int distance(SDL_Point pt1, SDL_FPoint pt2);
 
-extern SDL_Point *is_ray_intersect_edge(SDL_edge edge, SDL_ray ray);
+extern SDL_FPoint *is_ray_intersect_edge(SDL_edge edge, SDL_ray ray);
 
 extern void add_rect_to_list(SDL_Event *event, SDL_Renderer *renderer, void *user_param);
 

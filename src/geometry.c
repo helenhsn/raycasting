@@ -24,7 +24,7 @@ static bool same_direction(SDL_vector2D a, SDL_vector2D b)
 }
 
 
-int distance(SDL_Point pt1, SDL_Point pt2)
+int distance(SDL_Point pt1, SDL_FPoint pt2)
 {
         return (pt1.x-pt2.x)*(pt1.x-pt2.x) + (pt1.y - pt2.y)*(pt1.y - pt2.y);
 }
@@ -38,7 +38,7 @@ static float max(float a, float b)
         return a>b? a : b;
 }
 
-static void get_intersection(SDL_Point **intersection_pt,
+static void get_intersection(SDL_FPoint **intersection_pt,
                              float x1, float y1,
                              float x2, float y2,
                              float x3, float y3,
@@ -75,20 +75,25 @@ static void get_intersection(SDL_Point **intersection_pt,
         }
 
         //check if the intersection is in the ray's direction
+        SDL_vector2D start_vector;
+        start_vector.dx = (*intersection_pt)->x - x1;
+        start_vector.dy = (*intersection_pt)->y - y1;
+
+        SDL_vector2D end_vector;
+        end_vector.dx = (*intersection_pt)->x - x2;
+        end_vector.dy = (*intersection_pt)->y - y2;
+
+        SDL_vector2D ray_vector;
+        ray_vector.dx = x4 - x3;
+        ray_vector.dy = y4 - y3;
+
         SDL_vector2D intersect_vector;
         intersect_vector.dx = (*intersection_pt)->x - x3;
         intersect_vector.dy = (*intersection_pt)->y - y3;
 
-        SDL_vector2D ray_vector;
-        ray_vector.dx = x4 -x3;
-        ray_vector.dy = y4 - y3;
 
-        if (!same_direction(ray_vector, intersect_vector)
-        || !(min(x1,x2)<= (*intersection_pt)->x
-        && (*intersection_pt)->x <= max(x1, x2)
-        && min(y1, y2) <=  (*intersection_pt)->y
-        &&  (*intersection_pt)->y <= max(y1, y2))
-        )
+        if (dot_product(start_vector, end_vector) >= 0
+        || dot_product(intersect_vector, ray_vector) <= 0)
         {
                 (*intersection_pt)->x = -1;
                 (*intersection_pt)->y = -1;
@@ -98,7 +103,7 @@ static void get_intersection(SDL_Point **intersection_pt,
 
 }
 
-SDL_Point *is_ray_intersect_edge(SDL_edge edge, SDL_ray ray)
+SDL_FPoint *is_ray_intersect_edge(SDL_edge edge, SDL_ray ray)
 {
         //edge points
         float x1 = edge.vertex_1.x;
@@ -125,7 +130,7 @@ SDL_Point *is_ray_intersect_edge(SDL_edge edge, SDL_ray ray)
                           x3, y3,
                           x4, y4);
 
-        if (intersection->x<0 && intersection->y<0)
+        if (((int)intersection->x<0) && ((int) intersection->y<0))
                 return NULL;
         fprintf(stderr, "------> YEEEEEEEEEEEEEEEEES intersection : (%f, %f)\n\n", intersection->x, intersection->y);
         return intersection;
