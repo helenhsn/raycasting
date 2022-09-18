@@ -29,24 +29,34 @@ typedef struct SDL_linked_event
  * */
 
 extern bool QUIT;
-
 extern bool first_button_down;
+extern SDL_linked_event *chain_events;
+extern SDL_Rect selector;
 
 /*
  * Functions & callbacks used for events handling
  * */
+extern void callback_release(SDL_Event *event, SDL_Renderer *renderer, void *param);
+
+extern void button_panel_callback(SDL_Event *event, SDL_Renderer *renderer, void *param);
+
+extern void clear_callback(SDL_Event *event, SDL_Renderer *renderer, void *param);
+
+extern void curves_callback(SDL_Event *event, SDL_Renderer *renderer, void *param);
+
+extern void rects_callback(SDL_Event *event, SDL_Renderer *renderer, void *param);
+
+extern void edges_callback(SDL_Event *event, SDL_Renderer *renderer, void *param);
+
+extern void rays_callback(SDL_Event *event, SDL_Renderer *renderer, void *param);
+
+extern void quit_callback(SDL_Event *event, SDL_Renderer *renderer, void *param);
+
+extern void free_chain_events();
 
 extern void bind_event(SDL_EventType event_type, SDL_callback callback, void *param);
 
 extern void unbind_event(SDL_EventType event_type, SDL_callback callback, void *param);
-
-extern void callback_release(SDL_Event *event, SDL_Renderer *renderer, void *param);
-
-extern void push_button_callback(SDL_Event *event, SDL_Renderer *renderer, void *param);
-
-extern void free_chain_events();
-
-extern void keydown_callback(SDL_Event *event, SDL_Renderer *renderer, void *param);
 
 extern void handle_event(SDL_Event event, SDL_Renderer *rend);
 

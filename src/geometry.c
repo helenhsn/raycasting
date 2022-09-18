@@ -3,39 +3,28 @@
 #include <SDL2/SDL.h>
 #include "geometry.h"
 #include "events.h"
+#include "render.h"
+#include "commands.h"
 
 
 SDL_Point mouse_pos;
 SDL_linked_drawing *chain_drawings          = NULL;
-static int rect_size                            = 30;
-bool CASTING_RAYS = false;
+static int rect_size                            = 5;
 SDL_ray *rays_array = NULL;
 
+bool is_point_in_rect(SDL_Rect rect, SDL_Point point)
+{
+        return point.x <= rect.x + rect.w && point.x >= rect.x && point.y >= rect.y && point.y <= rect.y + rect.h;
+}
 
 static float dot_product(SDL_vector2D a, SDL_vector2D b)
 {
         return a.dx*b.dx + a.dy*b.dy;
 }
 
-
-static bool same_direction(SDL_vector2D a, SDL_vector2D b)
-{
-        return dot_product(a, b)>0? true: false;
-}
-
-
 int distance(SDL_Point pt1, SDL_FPoint pt2)
 {
         return (pt1.x-pt2.x)*(pt1.x-pt2.x) + (pt1.y - pt2.y)*(pt1.y - pt2.y);
-}
-static float min(float a, float b)
-{
-        return a<b? a : b;
-}
-
-static float max(float a, float b)
-{
-        return a>b? a : b;
 }
 
 static void get_intersection(SDL_FPoint **intersection_pt,
@@ -118,8 +107,6 @@ SDL_FPoint *is_ray_intersect_edge(SDL_edge edge, SDL_ray ray)
         float y4 = ray.end_point.y;
 
 
-        fprintf(stderr, "\ntesting edge [(%f,%f), (%f,%f)] and ray [(%f,%f), (%f,%f)]", x1, y1, x2, y2, x3, y3, x4, y4);
-
 
         SDL_FPoint null_point = {-1,-1};
         SDL_FPoint *intersection = &null_point;
@@ -132,16 +119,18 @@ SDL_FPoint *is_ray_intersect_edge(SDL_edge edge, SDL_ray ray)
 
         if (((int)intersection->x<0) && ((int) intersection->y<0))
                 return NULL;
-        fprintf(stderr, "------> YEEEEEEEEEEEEEEEEES intersection : (%f, %f)\n\n", intersection->x, intersection->y);
         return intersection;
 }
 
 void add_rect_to_list(SDL_Event *event, SDL_Renderer *renderer, void *user_param)
 {
+        if (mouse_pos.x + rect_size/2 > w_width - panel_width)
+                return;
         SDL_Rect new_rect           = {mouse_pos.x - rect_size/2, mouse_pos.y - rect_size/2, rect_size, rect_size};
         SDL_linked_drawing **first_drawing     = &chain_drawings;
         SDL_linked_drawing *drawing_to_add     = malloc(sizeof(SDL_linked_drawing));
         drawing_to_add->drawing.rect = new_rect;
+        drawing_to_add->renderfunc = render_rect;
         drawing_to_add->next        = chain_drawings;
         *first_drawing = drawing_to_add;
 
@@ -152,6 +141,7 @@ void add_edge_to_list(SDL_Event *event, SDL_Renderer *renderer, void *user_param
         SDL_linked_drawing **first_drawing = &chain_drawings;
         SDL_linked_drawing  *drawing_to_add = malloc(sizeof(SDL_linked_drawing));
         drawing_to_add->drawing.edge = * ((SDL_edge *)user_param);
+        drawing_to_add->renderfunc = render_edge;
         drawing_to_add->next = chain_drawings;
         *first_drawing = drawing_to_add;
 
@@ -172,4 +162,5 @@ void free_chain_drawings()
                 drawing_to_free = NULL;
         }
         chain_drawings = NULL;
+
 }

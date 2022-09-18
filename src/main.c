@@ -3,8 +3,10 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include "events.h"
 #include "geometry.h"
+#include "commands.h"
 #include "render.h"
 
 /*--------------------------------------------*/
@@ -14,10 +16,35 @@ bool QUIT         = false;
 /*---------------------------------------------*/
 
 
-void update_window(SDL_Renderer *rend)
+static void init_rendering(SDL_Window **window,
+                           SDL_Renderer **renderer)
+{
+        uint32_t  render_flags = SDL_RENDERER_ACCELERATED
+                                | SDL_RENDERER_PRESENTVSYNC
+                                | SDL_RENDERER_TARGETTEXTURE;
+
+
+
+        //CREATING MAIN WINDOW
+        char *title_project = "Raycasting project";
+        *window = SDL_CreateWindow(title_project, SDL_WINDOWPOS_CENTERED,
+                                              SDL_WINDOWPOS_CENTERED, w_width,
+                                              w_height, 0);
+        *renderer = SDL_CreateRenderer(*window, -1, render_flags);
+
+        if ((!*window) | (!*renderer))
+                QUIT = true;
+
+        //clearing windows
+        SDL_RenderClear(*renderer);
+}
+
+
+static void update_window(SDL_Renderer *rend)
 {
         while (!QUIT)
         {
+
                 //clearing renderer
                 SDL_SetRenderDrawColor(rend, 0, 2, 0, 255);
                 SDL_RenderClear(rend);
@@ -25,15 +52,14 @@ void update_window(SDL_Renderer *rend)
                 //events handling
                 SDL_Event current_event;
                 SDL_GetMouseState(&mouse_pos.x, &mouse_pos.y);
-                while (SDL_PollEvent(&current_event))
+                while (SDL_PollEvent(&current_event)) {
                         handle_event(current_event, rend);
+                }
 
-                //rendering
+                //rendering main window
                 render_objects(rend);
+                render_text(rend);
                 SDL_RenderPresent(rend);
-
-                //waiting before repeating (or not)
-
         }
 }
 
@@ -41,6 +67,18 @@ static void app_free()
 {
         free_chain_events();
         free_chain_drawings();
+}
+
+static void app_quit(SDL_Renderer *rend,
+                     SDL_Window *window) {
+        app_free();
+        TTF_CloseFont(font_title);
+        TTF_CloseFont(font_buttons);
+        TTF_Quit();
+        SDL_DestroyRenderer(rend);
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+
 }
 
 int main()
@@ -52,21 +90,17 @@ int main()
         }
         printf("Hello, World!\n");
 
-        //creating window
-        char *title = "Raycasting project";
-        SDL_Window *window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED,
-                                          SDL_WINDOWPOS_CENTERED, w_width,
-                                          w_height, 0);
-        //renderer for the window
-        uint32_t  render_flags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC;
-        SDL_Renderer  *renderer = SDL_CreateRenderer(window, -1, render_flags);
+        //creating renderers
+        SDL_Renderer *renderer;
+        SDL_Window *window;
 
+        init_rendering(&window, &renderer);
 
-        SDL_RenderClear(renderer); //clear window
+        init_command_panel(renderer);
 
         //bind initial events
-        bind_event(SDL_MOUSEBUTTONDOWN, push_button_callback, NULL);
-        bind_event(SDL_KEYDOWN, keydown_callback, NULL);
+        bind_event(SDL_MOUSEBUTTONDOWN, button_panel_callback, NULL);
+        bind_event(SDL_KEYDOWN, quit_callback, NULL);
 
         //initialize drawing chain with the window's edges
         init_drawing(renderer);
@@ -75,18 +109,10 @@ int main()
         update_window(renderer);
 
 
-        if ((!window)|(!renderer)) {
-                SDL_DestroyWindow(window);
-                SDL_Quit();
-                return EXIT_FAILURE;
-        }
+        unbind_event(SDL_MOUSEBUTTONDOWN, button_panel_callback, NULL);
+        unbind_event(SDL_KEYDOWN, quit_callback, NULL);
 
-        unbind_event(SDL_MOUSEBUTTONDOWN, push_button_callback, NULL);
-        unbind_event(SDL_KEYDOWN, keydown_callback, NULL);
 
-        app_free();
-        SDL_DestroyRenderer(renderer);
-        SDL_DestroyWindow(window);
-        SDL_Quit();
+        app_quit(renderer, window);
         return EXIT_SUCCESS;
 }
