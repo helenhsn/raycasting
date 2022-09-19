@@ -79,14 +79,11 @@ void edges_callback(SDL_Event *event, SDL_Renderer *renderer, void *param)
         }
         if (first_button_down)
         {
-                fprintf(stderr, "\n ---------- ok1");
                 start_point = mouse_pos;
                 first_button_down = false;
-
         }
-        else{
-
-                fprintf(stderr, "\nok2");
+        else
+        {
                 first_button_down = true;
                 SDL_edge edge_to_draw = {start_point, mouse_pos};
                 add_edge_to_list(event, renderer, &edge_to_draw);
@@ -110,9 +107,8 @@ void callback_release(SDL_Event *event, SDL_Renderer *renderer, void *param)
 void button_panel_callback(SDL_Event *event, SDL_Renderer *renderer, void *param)
 {
         button_pressed = SDL_GetMouseState(&mouse_pos.x, &mouse_pos.y);
-        //SDL_Log("Mouse button is pressed at %u %u", mouse_pos.x, mouse_pos.y);
+        SDL_Log("Mouse button is pressed at %u %u", mouse_pos.x, mouse_pos.y);
 
-        //fprintf(stderr, "probleme");
         if (!is_mouse_in_panel() || (button_pressed & SDL_BUTTON_LMASK) == 0) {
                 return;
         }
@@ -120,28 +116,19 @@ void button_panel_callback(SDL_Event *event, SDL_Renderer *renderer, void *param
         while (current_frame)
         {
                 if (is_point_in_rect(current_frame->button.rect, mouse_pos) && current_frame->pushable)
-                {
-                        fprintf(stderr, "\nid detected : %i", current_frame->button.id);
                         break;
-                }
                 current_frame = current_frame->next;
         }
-        fprintf(stderr, "\nbool : %d", current_frame->button.sunken);
         if (current_frame &&(!current_frame->button.sunken))
         {
                 if (!current_button)
-                {
-                        fprintf(stderr, "\n new button selected");
                         update_current_button(event, renderer, param, &current_frame->button);
-                }
                 else if (current_frame->button.id != current_button->id) //change drawings
                 {
-                        fprintf(stderr, "\n change button");
                         cancel_current_button();
                         update_current_button(event, renderer, param,&current_frame->button);
                 }
                 else { // cancel current drawing
-                        fprintf(stderr, "\n cancel drawing");
                         cancel_current_button();
                         current_button = NULL;
                         current_frame->button.sunken = false;

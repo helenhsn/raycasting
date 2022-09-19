@@ -11,7 +11,7 @@ int w_width = 1000;
 int w_height = 800;
 int panel_width = 200;
 int panel_height = 200;
-int nb_ray = 100;
+int nb_ray = 120;
 
 void init_drawing(SDL_Renderer *renderer)
 {

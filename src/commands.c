@@ -86,8 +86,8 @@ void init_command_panel(SDL_Renderer *renderer)
 {
         //font
         TTF_Init();
-        font_title = TTF_OpenFont("/home/helen/Documents/GIT/raycasting/fonts/NotoSansMono-Bold.ttf", 24);
-        font_buttons = TTF_OpenFont("/home/helen/Documents/GIT/raycasting/fonts/NotoSansMono-Regular.ttf", 18);
+        font_title = TTF_OpenFont("../fonts/NotoSansMono-Bold.ttf", 24);
+        font_buttons = TTF_OpenFont("../fonts/NotoSansMono-Regular.ttf", 18);
         if ((!font_title) || (!font_buttons))
                 printf("TTF_OpenFont : %s \n", TTF_GetError());
 
