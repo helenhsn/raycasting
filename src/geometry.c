@@ -4,17 +4,37 @@
 #include "geometry.h"
 #include "events.h"
 #include "render.h"
-#include "commands.h"
 
 
-SDL_Point mouse_pos;
+SDL_FPoint mouse_pos;
 SDL_linked_drawing *chain_drawings          = NULL;
 static int rect_size                            = 5;
 SDL_ray *rays_array = NULL;
+int nb_ray = 1000;
 
-bool is_point_in_rect(SDL_Rect rect, SDL_Point point)
+bool is_point_in_rect(SDL_Rect rect, SDL_FPoint point)
 {
         return point.x <= rect.x + rect.w && point.x >= rect.x && point.y >= rect.y && point.y <= rect.y + rect.h;
+}
+
+void init_drawing(SDL_Renderer *renderer)
+{
+        SDL_edge left_edge = {0,0,0,w_height};
+        add_edge_to_list(NULL, renderer, &left_edge);
+
+        SDL_edge top_edge = {0,0,w_width - panel_width, 0};
+        add_edge_to_list(NULL, renderer, &top_edge);
+
+        SDL_edge right_edge = {w_width-1 -panel_width, 0, w_width-1 - panel_width, w_height};
+        add_edge_to_list(NULL, renderer, &right_edge);
+
+        SDL_edge bottom_edge = {0, w_height-1,  w_width - panel_width, w_height-1};
+        add_edge_to_list(NULL, renderer, &bottom_edge);
+}
+
+void init_rays()
+{
+        rays_array = calloc(nb_ray, sizeof(SDL_ray));
 }
 
 static float dot_product(SDL_vector2D a, SDL_vector2D b)
@@ -22,12 +42,12 @@ static float dot_product(SDL_vector2D a, SDL_vector2D b)
         return a.dx*b.dx + a.dy*b.dy;
 }
 
-int distance(SDL_Point pt1, SDL_FPoint pt2)
+inline float distance(SDL_FPoint *pt1, SDL_FPoint *pt2)
 {
-        return (pt1.x-pt2.x)*(pt1.x-pt2.x) + (pt1.y - pt2.y)*(pt1.y - pt2.y);
+        return (pt1->x-pt2->x)*(pt1->x-pt2->x) + (pt1->y - pt2->y)*(pt1->y - pt2->y);
 }
 
-static void get_intersection(SDL_FPoint **intersection_pt,
+static void get_intersection(SDL_FPoint *intersection_pt,
                              float x1, float y1,
                              float x2, float y2,
                              float x3, float y3,
@@ -48,51 +68,52 @@ static void get_intersection(SDL_FPoint **intersection_pt,
 
         else if (x1==x2) //vertical edge
         {
-                (*intersection_pt)->x = x1;
-                (*intersection_pt)->y = x1 * a2 + b2 ;
+                (intersection_pt)->x = x1;
+                (intersection_pt)->y = x1 * a2 + b2 ;
 
         }
         else if (x3==x4) //vertical ray
         {
-                (*intersection_pt)->x = x3;
-                (*intersection_pt)->y = x3 * a1 + b1 ;
+                (intersection_pt)->x = x3;
+                (intersection_pt)->y = x3 * a1 + b1 ;
         }
+
         else //non verticals edge & rays
         {
-                (*intersection_pt)->x = (b1 - b2)/(a2 - a1);
-                (*intersection_pt)->y =  a2 * (*intersection_pt)->x + b2;
+                (intersection_pt)->x = (b1 - b2)/(a2 - a1);
+                (intersection_pt)->y =  a2 * (intersection_pt)->x + b2;
         }
 
         //check if the intersection is in the ray's direction
         SDL_vector2D start_vector;
-        start_vector.dx = (*intersection_pt)->x - x1;
-        start_vector.dy = (*intersection_pt)->y - y1;
+        start_vector.dx = (intersection_pt)->x - x1;
+        start_vector.dy = (intersection_pt)->y - y1;
 
         SDL_vector2D end_vector;
-        end_vector.dx = (*intersection_pt)->x - x2;
-        end_vector.dy = (*intersection_pt)->y - y2;
+        end_vector.dx = (intersection_pt)->x - x2;
+        end_vector.dy = (intersection_pt)->y - y2;
 
         SDL_vector2D ray_vector;
         ray_vector.dx = x4 - x3;
         ray_vector.dy = y4 - y3;
 
         SDL_vector2D intersect_vector;
-        intersect_vector.dx = (*intersection_pt)->x - x3;
-        intersect_vector.dy = (*intersection_pt)->y - y3;
+        intersect_vector.dx = (intersection_pt)->x - x3;
+        intersect_vector.dy = (intersection_pt)->y - y3;
 
 
         if (dot_product(start_vector, end_vector) >= 0
         || dot_product(intersect_vector, ray_vector) <= 0)
         {
-                (*intersection_pt)->x = -1;
-                (*intersection_pt)->y = -1;
+                (intersection_pt)->x = -1;
+                (intersection_pt)->y = -1;
         }
 
 
 
 }
 
-SDL_FPoint *is_ray_intersect_edge(SDL_edge edge, SDL_ray ray)
+bool is_ray_intersect_edge(SDL_FPoint *intersection, SDL_edge edge, SDL_ray ray)
 {
         //edge points
         float x1 = edge.vertex_1.x;
@@ -107,19 +128,15 @@ SDL_FPoint *is_ray_intersect_edge(SDL_edge edge, SDL_ray ray)
         float y4 = ray.end_point.y;
 
 
-
-        SDL_FPoint null_point = {-1,-1};
-        SDL_FPoint *intersection = &null_point;
-
-        get_intersection(&intersection,
+        get_intersection(intersection,
                           x1, y1,
                           x2, y2,
                           x3, y3,
                           x4, y4);
 
-        if (((int)intersection->x<0) && ((int) intersection->y<0))
-                return NULL;
-        return intersection;
+        if ((intersection->x<0) && (intersection->y<0))
+                return false;
+        return true;
 }
 
 void add_rect_to_list(SDL_Event *event, SDL_Renderer *renderer, void *user_param)
@@ -153,14 +170,18 @@ void add_edge_to_list(SDL_Event *event, SDL_Renderer *renderer, void *user_param
 
 void free_chain_drawings()
 {
+
+        //free rects & edges
         SDL_linked_drawing *current_drawing = chain_drawings;
         while (current_drawing)
         {
                 SDL_linked_drawing *drawing_to_free = current_drawing;
                 current_drawing = current_drawing->next;
                 free(drawing_to_free);
-                drawing_to_free = NULL;
         }
         chain_drawings = NULL;
+
+        //free rays
+        free(rays_array);
 
 }

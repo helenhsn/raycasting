@@ -10,60 +10,35 @@
 int w_width = 1000;
 int w_height = 800;
 int panel_width = 200;
-int panel_height = 200;
-int nb_ray = 120;
+int panel_height = 100;
 
-void init_drawing(SDL_Renderer *renderer)
-{
-        SDL_edge left_edge = {0,0,0,w_height};
-        add_edge_to_list(NULL, renderer, &left_edge);
-
-        SDL_edge top_edge = {0,0,w_width - panel_width, 0};
-        add_edge_to_list(NULL, renderer, &top_edge);
-
-        SDL_edge right_edge = {w_width-1 -panel_width, 0, w_width-1 - panel_width, w_height};
-        add_edge_to_list(NULL, renderer, &right_edge);
-
-        SDL_edge bottom_edge = {0, w_height-1,  w_width - panel_width, w_height-1};
-        add_edge_to_list(NULL, renderer, &bottom_edge);
-}
-
-void init_rays()
-{
-        rays_array = calloc(nb_ray, sizeof(SDL_ray));
-        for (int32_t i = 0; i < nb_ray; i++)
-        {
-                rays_array[i].start_point = mouse_pos;
-                rays_array[i].direction.dx = -i*2*M_PI/nb_ray;
-                rays_array[i].direction.dy = -i*2*M_PI/nb_ray; //direction is a const for each ray
-                rays_array[i].end_point.x = (float) mouse_pos.x + cos(-i*2*M_PI/nb_ray);
-                rays_array[i].end_point.y = (float) mouse_pos.y + sin(-i*2*M_PI/nb_ray);
-        }
-}
 void render_rays(SDL_Event *event, SDL_Renderer *rend, void *param)
 {
         if (is_mouse_in_panel())
                 return;
-
-        for (int8_t i = 0; i < nb_ray; i++)
+        for (uint16_t i = 0; i < nb_ray; i++)
         {
-                rays_array[i].start_point = mouse_pos;
-                rays_array[i].end_point.x = (float) mouse_pos.x + cos(-i*2*M_PI/nb_ray);
-                rays_array[i].end_point.y = (float) mouse_pos.y + sin(-i*2*M_PI/nb_ray);
-                SDL_FPoint last_endpoint = {0,0};
+                rays_array[i].start_point.x = mouse_pos.x;
+                rays_array[i].start_point.y = mouse_pos.y;
+                rays_array[i].end_point.x = mouse_pos.x + cos(-i*2*M_PI/nb_ray);
+                rays_array[i].end_point.y = mouse_pos.y + sin(-i*2*M_PI/nb_ray);
+                SDL_FPoint last_endpoint = {-1,-1};
+                SDL_FPoint intersect_pt = {-2, -2};
                 SDL_linked_drawing *current_edge = chain_drawings;
 
                 while (current_edge)
                 {
-                        SDL_FPoint *intersect_pt = is_ray_intersect_edge(current_edge->drawing.edge, rays_array[i]);
-                        if ((intersect_pt)
-                        &&((distance(mouse_pos, *intersect_pt) < distance(mouse_pos, last_endpoint))
-                        || (last_endpoint.x == 0 && last_endpoint.y == 0)))
-                                last_endpoint = *intersect_pt;
+                        if (is_ray_intersect_edge(&intersect_pt, current_edge->drawing.edge, rays_array[i]))
+                        {
+                                if ( (last_endpoint.x == -1 && last_endpoint.y == -1) || distance(&mouse_pos, &intersect_pt) < distance(&mouse_pos, &last_endpoint))
+                                {
+                                        last_endpoint.x = intersect_pt.x;
+                                        last_endpoint.y = intersect_pt.y;
+                                }
+                        }
 
                         current_edge = current_edge->next;
                 }
-
                 //draw the endpoint with the smallest distance from the mouse (the other ones are stopped by the edge)
                 SDL_SetRenderDrawColor(rend, 255, 255, 255, 255);
                 SDL_RenderDrawLine(rend,
@@ -71,6 +46,7 @@ void render_rays(SDL_Event *event, SDL_Renderer *rend, void *param)
                                    rays_array[i].start_point.y,
                                    last_endpoint.x,
                                    last_endpoint.y);
+
         }
 
 

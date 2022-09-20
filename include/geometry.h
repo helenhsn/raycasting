@@ -20,15 +20,14 @@ typedef struct SDL_vector2D
 
 typedef struct SDL_edge
 {
-    SDL_Point vertex_1;
-    SDL_Point vertex_2;
+    SDL_FPoint vertex_1;
+    SDL_FPoint vertex_2;
 } SDL_edge;
 
 typedef struct SDL_ray
 {
-    SDL_Point start_point;
+    SDL_FPoint start_point;
     SDL_FPoint end_point; //used for rendering
-    SDL_vector2D direction;
 } SDL_ray ;
 
 typedef union SDL_drawing
@@ -51,21 +50,24 @@ typedef struct SDL_linked_drawing
  * Global variables
  * */
 
-extern SDL_Point mouse_pos;
-extern SDL_Scancode drawing_type;
+extern SDL_FPoint mouse_pos;
 extern SDL_linked_drawing *chain_drawings;
 extern SDL_ray *rays_array;
-extern bool CASTING_RAYS;
+extern int nb_ray;
 
 /*
  * Functions for rectangles & edges
  * */
 
-extern bool is_point_in_rect(SDL_Rect rect, SDL_Point point);
+extern bool is_point_in_rect(SDL_Rect rect, SDL_FPoint point);
 
-extern int distance(SDL_Point pt1, SDL_FPoint pt2);
+extern float distance(SDL_FPoint *pt1, SDL_FPoint *pt2);
 
-extern SDL_FPoint *is_ray_intersect_edge(SDL_edge edge, SDL_ray ray);
+extern void init_rays();
+
+extern void init_drawing(SDL_Renderer *renderer);
+
+extern bool is_ray_intersect_edge(SDL_FPoint *intersection, SDL_edge edge, SDL_ray ray);
 
 extern void add_rect_to_list(SDL_Event *event, SDL_Renderer *renderer, void *user_param);
 

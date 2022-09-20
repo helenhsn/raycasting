@@ -11,11 +11,11 @@
 #include "render.h"
 
 
-static Uint32 button_pressed;
+
 static SDL_button *current_button = NULL;
 SDL_linked_event *chain_events    = NULL;
 bool first_button_down            = true;
-static SDL_Point start_point;
+static SDL_FPoint start_point;
 SDL_Rect selector;
 
 /*--------------- CALLBACKS ---------------------*/
@@ -51,6 +51,7 @@ void clear_callback(SDL_Event *event, SDL_Renderer *renderer, void *param)
 {
         free_chain_drawings();
         init_drawing(renderer);
+        init_rays();
         SDL_button *button = (SDL_button *)param;
         button->sunken = false;
         current_button = NULL;
@@ -92,7 +93,6 @@ void edges_callback(SDL_Event *event, SDL_Renderer *renderer, void *param)
 
 void rays_callback(SDL_Event *event, SDL_Renderer *renderer, void *param)
 {
-        init_rays();
         bind_event(SDL_MOUSEMOTION, render_rays, NULL);
 }
 
@@ -106,12 +106,11 @@ void callback_release(SDL_Event *event, SDL_Renderer *renderer, void *param)
 
 void button_panel_callback(SDL_Event *event, SDL_Renderer *renderer, void *param)
 {
-        button_pressed = SDL_GetMouseState(&mouse_pos.x, &mouse_pos.y);
-        SDL_Log("Mouse button is pressed at %u %u", mouse_pos.x, mouse_pos.y);
+        SDL_Log("Mouse button is pressed at %f %f", mouse_pos.x, mouse_pos.y);
 
-        if (!is_mouse_in_panel() || (button_pressed & SDL_BUTTON_LMASK) == 0) {
+        if (!is_mouse_in_panel())
                 return;
-        }
+
         SDL_text_frame *current_frame = chain_text;
         while (current_frame)
         {
@@ -152,10 +151,9 @@ void free_chain_events()
         SDL_linked_event *current_event = chain_events;
         while (current_event)
         {
-                SDL_linked_event  **ptr_event_to_free = &current_event;
+                SDL_linked_event  *event_to_free = current_event;
                 current_event = current_event->next;
-                free(*ptr_event_to_free);
-                *ptr_event_to_free = NULL;
+                free(event_to_free);
         }
         chain_events = NULL;
 }
@@ -191,9 +189,9 @@ void unbind_event(SDL_EventType event_type, SDL_callback callback, void *param)
                 SDL_linked_event *event_to_free = current_event->next;
                 current_event->next = event_to_free->next;
 
-                SDL_linked_event **ptr_event_free = &event_to_free;
-                free(*ptr_event_free);
-                *ptr_event_free = NULL;
+                SDL_linked_event **ptr_event_to_free = &event_to_free;
+                free(*ptr_event_to_free);
+                *ptr_event_to_free = NULL;
         }
 
         chain_events = sentinel_event.next;
@@ -208,6 +206,6 @@ void handle_event(SDL_Event event, SDL_Renderer *rend)
         {
                 if (current_linked_event->type == event.type)
                         current_linked_event->callback(&event, rend, current_linked_event->param);
-        current_linked_event = current_linked_event->next;
+                current_linked_event = current_linked_event->next;
         }
 }

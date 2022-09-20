@@ -21,7 +21,7 @@ typedef struct frame_info {
 
 bool is_mouse_in_panel()
 {
-        return mouse_pos.x > w_width - panel_width;
+        return (int) mouse_pos.x > w_width - panel_width;
 }
 
 static SDL_Texture *create_texture(SDL_Renderer *renderer, SDL_text_frame *frame)
@@ -107,7 +107,17 @@ void init_command_panel(SDL_Renderer *renderer)
                                   {5, clear_callback, "CLEAR DRAWINGS"}};
 
         for (uint8_t i=0; i<5; i++)
-        {
                 add_to_text_list(renderer, button_strings[i], text_color, button_color, true);
+}
+
+void free_panel()
+{
+        SDL_text_frame *current_frame = chain_text;
+        while (current_frame)
+        {
+                SDL_text_frame *frame_to_free = current_frame;
+                current_frame = current_frame->next;
+                free(frame_to_free);
         }
+        chain_text = NULL;
 }

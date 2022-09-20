@@ -38,5 +38,6 @@ extern SDL_text_frame *chain_text;
 
 extern bool is_mouse_in_panel();
 extern void init_command_panel(SDL_Renderer *renderer);
+extern void free_panel();
 
 #endif //RAYCASTING_COMMANDS_H

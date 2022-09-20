@@ -42,16 +42,22 @@ static void init_rendering(SDL_Window **window,
 
 static void update_window(SDL_Renderer *rend)
 {
+        uint32_t FPS = 60;
+        uint32_t start_time;
         while (!QUIT)
         {
-
+                start_time = SDL_GetTicks();
                 //clearing renderer
                 SDL_SetRenderDrawColor(rend, 0, 2, 0, 255);
                 SDL_RenderClear(rend);
 
+                SDL_Point int_mouse_pos;
+                SDL_GetMouseState(&int_mouse_pos.x, &int_mouse_pos.y);
+                mouse_pos.x = (float) int_mouse_pos.x;
+                mouse_pos.y = (float) int_mouse_pos.y;
+
                 //events handling
                 SDL_Event current_event;
-                SDL_GetMouseState(&mouse_pos.x, &mouse_pos.y);
                 while (SDL_PollEvent(&current_event)) {
                         handle_event(current_event, rend);
                 }
@@ -60,6 +66,10 @@ static void update_window(SDL_Renderer *rend)
                 render_objects(rend);
                 render_text(rend);
                 SDL_RenderPresent(rend);
+
+                //limiting to 60fps
+                if (1000/60 > SDL_GetTicks() - start_time)
+                        SDL_Delay(1000/60 - (SDL_GetTicks() - start_time));
         }
 }
 
@@ -67,6 +77,7 @@ static void app_free()
 {
         free_chain_events();
         free_chain_drawings();
+        free_panel();
 }
 
 static void app_quit(SDL_Renderer *rend,
@@ -95,7 +106,7 @@ int main()
         SDL_Window *window;
 
         init_rendering(&window, &renderer);
-
+        init_rays();
         init_command_panel(renderer);
 
         //bind initial events
