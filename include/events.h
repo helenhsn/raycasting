@@ -32,7 +32,6 @@ extern bool QUIT;
 extern bool first_button_down;
 extern SDL_linked_event *chain_events;
 extern SDL_Rect selector;
-
 /*
  * Functions & callbacks used for events handling
  * */

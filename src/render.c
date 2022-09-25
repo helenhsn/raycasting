@@ -6,6 +6,7 @@
 #include <math.h>
 #include "geometry.h"
 #include "commands.h"
+#include "bezier.h"
 
 int w_width = 1000;
 int w_height = 800;
@@ -68,6 +69,33 @@ void render_edge(SDL_Renderer *renderer, SDL_drawing drawing)
                            drawing.edge.vertex_2.y);
 }
 
+void render_curves(SDL_Renderer *renderer)
+{
+        if (!bezier_smoothed_values)
+                return;
+        int points_w_h = 4;
+        SDL_linked_FPoint *point_before = bezier_smoothed_values;
+        SDL_linked_FPoint *current_point = point_before->next;
+        while (current_point)
+        {
+                SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+                SDL_RenderDrawLineF(renderer,
+                                    point_before->point.x,
+                                    point_before->point.y,
+                                    current_point->point.x,
+                                    current_point->point.y);
+                SDL_Rect point_symbol = {point_before->point.x - points_w_h/2,
+                                   point_before->point.y - points_w_h/2,
+                                   points_w_h,
+                                   points_w_h};
+                SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+                SDL_RenderDrawRect(renderer, &point_symbol);
+                SDL_RenderFillRect(renderer, &point_symbol);
+                current_point = current_point->next;
+                point_before = point_before->next;
+        }
+}
+
 void render_objects(SDL_Renderer *renderer) // draw all objects (edges or rects) onto the screen
 {
         SDL_linked_drawing *current_drawing = chain_drawings;
@@ -77,6 +105,7 @@ void render_objects(SDL_Renderer *renderer) // draw all objects (edges or rects)
                 current_drawing = current_drawing->next;
         }
 }
+
 
 void render_text(SDL_Renderer *renderer)
 {

@@ -8,6 +8,7 @@
 #include "geometry.h"
 #include "commands.h"
 #include "render.h"
+#include "bezier.h"
 
 /*--------------------------------------------*/
 
@@ -65,6 +66,7 @@ static void update_window(SDL_Renderer *rend)
                 //rendering main window
                 render_objects(rend);
                 render_text(rend);
+                render_curves(rend);
                 SDL_RenderPresent(rend);
 
                 //limiting to 60fps
@@ -77,6 +79,7 @@ static void app_free()
 {
         free_chain_events();
         free_chain_drawings();
+        free_curves();
         free_panel();
 }
 

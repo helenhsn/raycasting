@@ -9,6 +9,7 @@
 #include "geometry.h"
 #include "commands.h"
 #include "render.h"
+#include "bezier.h"
 
 
 
@@ -16,6 +17,8 @@ static SDL_button *current_button = NULL;
 SDL_linked_event *chain_events    = NULL;
 bool first_button_down            = true;
 static SDL_FPoint start_point;
+static int nb_control_points = 0;
+static int total_control_points = 0;
 SDL_Rect selector;
 
 /*--------------- CALLBACKS ---------------------*/
@@ -35,6 +38,10 @@ static void update_current_button(SDL_Event *event, SDL_Renderer *renderer, void
         switch (button->id) {
                 case 1: case 5:
                         button->callback(event, renderer, button);
+                        break;
+                case 4:
+                        create_tab_control_points();
+                        bind_event(SDL_MOUSEBUTTONDOWN, button->callback, button);
                         break;
                 default:
                         bind_event(SDL_MOUSEBUTTONDOWN, button->callback, button);
@@ -60,7 +67,16 @@ void clear_callback(SDL_Event *event, SDL_Renderer *renderer, void *param)
 
 void curves_callback(SDL_Event *event, SDL_Renderer *renderer, void *param)
 {
-        //TODO
+        control_points[nb_control_points] = mouse_pos;
+        nb_control_points++;
+        if (nb_control_points == 4)
+        {
+                SDL_Log("Mouse button is pressed at %f %f", mouse_pos.x, mouse_pos.y);
+                smooth_bezier_curve(renderer);
+                nb_control_points = 1;
+                control_points[0]=mouse_pos;
+        }
+        return;
 }
 
 

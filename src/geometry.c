@@ -4,48 +4,28 @@
 #include "geometry.h"
 #include "events.h"
 #include "render.h"
+#include "bezier.h"
 
 
 SDL_FPoint mouse_pos;
 SDL_linked_drawing *chain_drawings          = NULL;
 static int rect_size                            = 5;
 SDL_ray *rays_array = NULL;
-int nb_ray = 1000;
+int nb_ray = 5;
 
-bool is_point_in_rect(SDL_Rect rect, SDL_FPoint point)
+
+/*--------------- TOOLS ----------------*/
+
+inline bool is_point_in_rect(SDL_Rect rect, SDL_FPoint point)
 {
         return point.x <= rect.x + rect.w && point.x >= rect.x && point.y >= rect.y && point.y <= rect.y + rect.h;
 }
 
-void init_drawing(SDL_Renderer *renderer)
-{
-        SDL_edge left_edge = {0,0,0,w_height};
-        add_edge_to_list(NULL, renderer, &left_edge);
-
-        SDL_edge top_edge = {0,0,w_width - panel_width, 0};
-        add_edge_to_list(NULL, renderer, &top_edge);
-
-        SDL_edge right_edge = {w_width-1 -panel_width, 0, w_width-1 - panel_width, w_height};
-        add_edge_to_list(NULL, renderer, &right_edge);
-
-        SDL_edge bottom_edge = {0, w_height-1,  w_width - panel_width, w_height-1};
-        add_edge_to_list(NULL, renderer, &bottom_edge);
-}
-
-void init_rays()
-{
-        rays_array = calloc(nb_ray, sizeof(SDL_ray));
-}
-
-static float dot_product(SDL_vector2D a, SDL_vector2D b)
+static inline float dot_product(SDL_vector2D a, SDL_vector2D b)
 {
         return a.dx*b.dx + a.dy*b.dy;
 }
 
-inline float distance(SDL_FPoint *pt1, SDL_FPoint *pt2)
-{
-        return (pt1->x-pt2->x)*(pt1->x-pt2->x) + (pt1->y - pt2->y)*(pt1->y - pt2->y);
-}
 
 static void get_intersection(SDL_FPoint *intersection_pt,
                              float x1, float y1,
@@ -139,6 +119,27 @@ bool is_ray_intersect_edge(SDL_FPoint *intersection, SDL_edge edge, SDL_ray ray)
         return true;
 }
 
+/*----------- DRAWINGS ----------*/
+void init_drawing(SDL_Renderer *renderer)
+{
+        SDL_edge left_edge = {0,0,0,w_height};
+        add_edge_to_list(NULL, renderer, &left_edge);
+
+        SDL_edge top_edge = {0,0,w_width - panel_width, 0};
+        add_edge_to_list(NULL, renderer, &top_edge);
+
+        SDL_edge right_edge = {w_width-1 -panel_width, 0, w_width-1 - panel_width, w_height};
+        add_edge_to_list(NULL, renderer, &right_edge);
+
+        SDL_edge bottom_edge = {0, w_height-1,  w_width - panel_width, w_height-1};
+        add_edge_to_list(NULL, renderer, &bottom_edge);
+}
+
+void init_rays()
+{
+        rays_array = calloc(nb_ray, sizeof(SDL_ray));
+}
+
 void add_rect_to_list(SDL_Event *event, SDL_Renderer *renderer, void *user_param)
 {
         if (mouse_pos.x + rect_size/2 > w_width - panel_width)
@@ -166,6 +167,9 @@ void add_edge_to_list(SDL_Event *event, SDL_Renderer *renderer, void *user_param
 
 
 }
+
+
+/*-------------- OTHERS ------------------*/
 
 
 void free_chain_drawings()

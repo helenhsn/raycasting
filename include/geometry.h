@@ -12,6 +12,7 @@
 /*
  * Elements to display on the screen
  * */
+
 typedef struct SDL_vector2D
 {
     float dx;
@@ -73,6 +74,7 @@ extern void add_rect_to_list(SDL_Event *event, SDL_Renderer *renderer, void *use
 
 extern void add_edge_to_list(SDL_Event *event, SDL_Renderer *renderer, void *user_param);
 
+extern void add_point_to_list(SDL_Event *event, SDL_Renderer *renderer, void *user_param);
 
 extern void free_chain_drawings();
 

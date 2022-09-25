@@ -22,6 +22,8 @@ extern void render_edge(SDL_Renderer *renderer, SDL_drawing drawing);
 
 extern void render_rect(SDL_Renderer *renderer, SDL_drawing drawing);
 
+extern void render_curves(SDL_Renderer *renderer);
+
 extern void render_objects(SDL_Renderer *renderer);
 
 extern void render_text(SDL_Renderer *renderer);
