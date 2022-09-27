@@ -7,6 +7,7 @@
 
 #include <stdbool.h>
 #include <SDL2/SDL.h>
+#include "bezier.h"
 
 
 /*
@@ -32,6 +33,7 @@ extern bool QUIT;
 extern bool first_button_down;
 extern SDL_linked_event *chain_events;
 extern SDL_Rect selector;
+extern SDL_linked_FPoint *chain_control_points;
 /*
  * Functions & callbacks used for events handling
  * */
@@ -44,6 +46,8 @@ extern void clear_callback(SDL_Event *event, SDL_Renderer *renderer, void *param
 extern void curves_callback(SDL_Event *event, SDL_Renderer *renderer, void *param);
 
 extern void rects_callback(SDL_Event *event, SDL_Renderer *renderer, void *param);
+
+extern void free_all_objects();
 
 extern void edges_callback(SDL_Event *event, SDL_Renderer *renderer, void *param);
 

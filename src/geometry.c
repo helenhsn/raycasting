@@ -11,10 +11,17 @@ SDL_FPoint mouse_pos;
 SDL_linked_drawing *chain_drawings          = NULL;
 static int rect_size                            = 5;
 SDL_ray *rays_array = NULL;
-int nb_ray = 5;
+int nb_ray = 1000;
 
 
 /*--------------- TOOLS ----------------*/
+
+SDL_FPoint affine_ratio(float a, SDL_FPoint pt1, float b, SDL_FPoint pt2)
+{
+        //a+b = 1
+        SDL_FPoint result = {a*pt1.x + b*pt2.x, a*pt1.y + b*pt2.y};
+        return result;
+}
 
 inline bool is_point_in_rect(SDL_Rect rect, SDL_FPoint point)
 {

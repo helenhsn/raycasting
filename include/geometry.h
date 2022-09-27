@@ -59,6 +59,7 @@ extern int nb_ray;
 /*
  * Functions for rectangles & edges
  * */
+extern SDL_FPoint affine_ratio(float a, SDL_FPoint pt1, float b, SDL_FPoint pt2);
 
 extern bool is_point_in_rect(SDL_Rect rect, SDL_FPoint point);
 

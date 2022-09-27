@@ -68,6 +68,22 @@ void render_edge(SDL_Renderer *renderer, SDL_drawing drawing)
                            drawing.edge.vertex_2.x,
                            drawing.edge.vertex_2.y);
 }
+static void draw_control_point(SDL_Renderer *renderer)
+{
+        int points_w_h = 10;
+        SDL_linked_FPoint *current_point = chain_control_points;
+        while (current_point)
+        {
+                SDL_Rect point_symbol = {current_point->point.x - points_w_h/2,
+                                         current_point->point.y - points_w_h/2,
+                                         points_w_h,
+                                         points_w_h};
+                SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+                SDL_RenderDrawRect(renderer, &point_symbol);
+                SDL_RenderFillRect(renderer, &point_symbol);
+                current_point = current_point->next;
+        }
+}
 
 void render_curves(SDL_Renderer *renderer)
 {
@@ -94,6 +110,7 @@ void render_curves(SDL_Renderer *renderer)
                 current_point = current_point->next;
                 point_before = point_before->next;
         }
+        draw_control_point(renderer);
 }
 
 void render_objects(SDL_Renderer *renderer) // draw all objects (edges or rects) onto the screen

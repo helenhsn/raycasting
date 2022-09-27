@@ -9,6 +9,8 @@ static const float step = 0.05;
 const int nb_values = (int) 1/step + 1;
 SDL_FPoint *control_points = NULL;
 SDL_linked_FPoint *bezier_smoothed_values = NULL;
+SDL_linked_FPoint *chain_control_points = NULL;
+int nb_control_points = 0;
 
 static int factorial(int n)
 {
@@ -100,13 +102,6 @@ static float larger_dist_smaller(SDL_bezier_FPoint *bezier_not_smoothed, float t
         }
 }
 
-static SDL_FPoint new_point_equidistant(SDL_bezier_FPoint *bezier_not_smoothed, float point_distance, SDL_FPoint result_point)
-{
-        //binary search followed by linear interpolation to find the index t so that the arc length in P(t) = point_distance
-        float t = larger_dist_smaller(bezier_not_smoothed, point_distance) / ((float) nb_values - 1);
-        compute_bezier_point( t, &result_point);
-}
-
 static void add_point_to_list(SDL_FPoint point)
 {
         SDL_linked_FPoint *first_point = bezier_smoothed_values;
@@ -114,6 +109,15 @@ static void add_point_to_list(SDL_FPoint point)
         new_point->point = point;
         new_point->next = bezier_smoothed_values;
         bezier_smoothed_values = new_point;
+}
+
+static SDL_FPoint new_point_equidistant(SDL_bezier_FPoint *bezier_not_smoothed, float point_distance)
+{
+        SDL_FPoint result_point={0,0};
+        //binary search followed by linear interpolation to find the index t so that the arc length in P(t) = point_distance
+        float t = larger_dist_smaller(bezier_not_smoothed, point_distance) / ((float) nb_values - 1);
+        compute_bezier_point( t, &result_point);
+        add_point_to_list(result_point);
 }
 
 
@@ -133,13 +137,12 @@ void smooth_bezier_curve(SDL_Renderer *renderer)
 
         while (counter < nb_values)
         {
-                /*
                 new_point_equidistant(bezier_values,
-                                      delta_arc*counter,
-                                      bezier_smoothed_values[counter]);
-                counter++;*/
-                add_point_to_list(bezier_values[counter].point);
+                                      delta_arc*counter);
                 counter++;
+                 /*
+                add_point_to_list(bezier_values[counter].point);
+                counter++;*/
         }
 
         add_point_to_list(bezier_values[nb_values-1].point);
@@ -161,6 +164,18 @@ void free_curves()
                 free(point_to_free);
         }
         bezier_smoothed_values = NULL;
+
+        current_point = chain_control_points;
+        while (current_point)
+        {
+                SDL_linked_FPoint *point_to_free = current_point;
+                current_point = current_point->next;
+                free(point_to_free);
+        }
+        chain_control_points = NULL;
+
+        nb_control_points = 0;
+
 }
 
 

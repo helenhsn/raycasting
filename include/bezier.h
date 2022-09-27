@@ -19,6 +19,8 @@ typedef struct SDL_linked_FPoint{
 
 extern SDL_FPoint *control_points;
 extern SDL_linked_FPoint *bezier_smoothed_values;
+extern SDL_linked_FPoint *chain_control_points;
+extern int nb_control_points;
 extern const int nb_values;
 
 extern float distance(SDL_FPoint *pt1, SDL_FPoint *pt2);

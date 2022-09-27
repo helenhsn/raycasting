@@ -78,8 +78,7 @@ static void update_window(SDL_Renderer *rend)
 static void app_free()
 {
         free_chain_events();
-        free_chain_drawings();
-        free_curves();
+        free_all_objects();
         free_panel();
 }
 

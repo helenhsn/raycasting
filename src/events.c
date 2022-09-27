@@ -17,8 +17,6 @@ static SDL_button *current_button = NULL;
 SDL_linked_event *chain_events    = NULL;
 bool first_button_down            = true;
 static SDL_FPoint start_point;
-static int nb_control_points = 0;
-static int total_control_points = 0;
 SDL_Rect selector;
 
 /*--------------- CALLBACKS ---------------------*/
@@ -53,10 +51,14 @@ static void update_current_button(SDL_Event *event, SDL_Renderer *renderer, void
         selector.h = 10;
 
 }
-
-void clear_callback(SDL_Event *event, SDL_Renderer *renderer, void *param)
+void free_all_objects()
 {
         free_chain_drawings();
+        free_curves();
+}
+void clear_callback(SDL_Event *event, SDL_Renderer *renderer, void *param)
+{
+        free_all_objects();
         init_drawing(renderer);
         init_rays();
         SDL_button *button = (SDL_button *)param;
@@ -64,17 +66,44 @@ void clear_callback(SDL_Event *event, SDL_Renderer *renderer, void *param)
         current_button = NULL;
 }
 
+static void add_control_point_to_list(SDL_FPoint point)
+{
+        SDL_linked_FPoint **first_point = &chain_control_points;
+        SDL_linked_FPoint *new_point = malloc(sizeof(SDL_linked_FPoint));
+        new_point->point = point;
+        new_point->next = chain_control_points;
+        *first_point = new_point;
+}
+
+static SDL_FPoint update_control_points()
+{
+        SDL_FPoint computed_point = affine_ratio(2, control_points[2], -1, control_points[3]);
+        SDL_FPoint temp_point = control_points[3];
+        control_points[3] = control_points[2];
+        control_points[2] = computed_point;
+        for (uint8_t i =0; i<4; i++)
+                add_control_point_to_list(control_points[i]);
+        add_control_point_to_list(temp_point);
+        return temp_point;
+}
 
 void curves_callback(SDL_Event *event, SDL_Renderer *renderer, void *param)
 {
+        if (is_mouse_in_panel())
+                return;
         control_points[nb_control_points] = mouse_pos;
         nb_control_points++;
+
+        fprintf(stderr, "\nnb control points  : %i", nb_control_points);
         if (nb_control_points == 4)
         {
-                SDL_Log("Mouse button is pressed at %f %f", mouse_pos.x, mouse_pos.y);
+                SDL_Log("Mouseeee button is pressed at %f %f", mouse_pos.x, mouse_pos.y);
+                SDL_FPoint temp_point = update_control_points();
                 smooth_bezier_curve(renderer);
-                nb_control_points = 1;
-                control_points[0]=mouse_pos;
+                nb_control_points = 2;
+                control_points[0] = control_points[3];
+                fprintf(stderr, "\nMOUSE : %f, %f ", mouse_pos.x, mouse_pos.y);
+                control_points[1] = temp_point;
         }
         return;
 }
