@@ -11,7 +11,6 @@
 extern int w_width;
 extern int w_height;
 extern int panel_width;
-extern int panel_height;
 
 
 extern void render_rays(SDL_Event *event, SDL_Renderer *rend, void *param);

@@ -8,8 +8,6 @@
 #include "geometry.h"
 #include "commands.h"
 #include "render.h"
-#include "bezier.h"
-
 /*--------------------------------------------*/
 
 bool QUIT         = false;

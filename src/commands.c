@@ -92,7 +92,7 @@ void init_command_panel(SDL_Renderer *renderer)
                 printf("TTF_OpenFont : %s \n", TTF_GetError());
 
         //adding buttons
-        SDL_Color text_color = {255, 120, 120};
+        SDL_Color text_color = {0, 255, 255};
         SDL_Color button_color = {255, 255, 255};
 
         //create title

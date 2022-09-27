@@ -81,9 +81,8 @@ static SDL_FPoint update_control_points()
         SDL_FPoint temp_point = control_points[3];
         control_points[3] = control_points[2];
         control_points[2] = computed_point;
-        for (uint8_t i =0; i<4; i++)
-                add_control_point_to_list(control_points[i]);
-        add_control_point_to_list(temp_point);
+
+        add_control_point_to_list(control_points[0]);
         return temp_point;
 }
 
@@ -93,16 +92,13 @@ void curves_callback(SDL_Event *event, SDL_Renderer *renderer, void *param)
                 return;
         control_points[nb_control_points] = mouse_pos;
         nb_control_points++;
-
-        fprintf(stderr, "\nnb control points  : %i", nb_control_points);
         if (nb_control_points == 4)
         {
-                SDL_Log("Mouseeee button is pressed at %f %f", mouse_pos.x, mouse_pos.y);
                 SDL_FPoint temp_point = update_control_points();
                 smooth_bezier_curve(renderer);
                 nb_control_points = 2;
                 control_points[0] = control_points[3];
-                fprintf(stderr, "\nMOUSE : %f, %f ", mouse_pos.x, mouse_pos.y);
+                add_control_point_to_list(control_points[0]);
                 control_points[1] = temp_point;
         }
         return;

@@ -5,7 +5,7 @@
 #include "bezier.h"
 #include <math.h>
 
-static const float step = 0.05;
+static const float step = 0.02;
 const int nb_values = (int) 1/step + 1;
 SDL_FPoint *control_points = NULL;
 SDL_linked_FPoint *bezier_smoothed_values = NULL;
@@ -85,10 +85,7 @@ static float larger_dist_smaller(SDL_bezier_FPoint *bezier_not_smoothed, float t
                 target_index = (index_low + index_high)/2;
         }
         if (bezier_not_smoothed[target_index].distance == target_distance )
-        {
-                fprintf(stderr, "\nbinary search r1");
                 return (float) target_index;
-        }
         else //linear interpolation between two points
         {
                 float length_before = bezier_not_smoothed[target_index].distance;
@@ -96,8 +93,6 @@ static float larger_dist_smaller(SDL_bezier_FPoint *bezier_not_smoothed, float t
                 float segment = length_after - length_before;
 
                 float fraction_segment = (target_distance - length_before)/segment; //where does the new point stand on the segment
-
-                fprintf(stderr, "\nbinary search r1");
                 return (float) target_index + fraction_segment;
         }
 }
@@ -140,9 +135,6 @@ void smooth_bezier_curve(SDL_Renderer *renderer)
                 new_point_equidistant(bezier_values,
                                       delta_arc*counter);
                 counter++;
-                 /*
-                add_point_to_list(bezier_values[counter].point);
-                counter++;*/
         }
 
         add_point_to_list(bezier_values[nb_values-1].point);

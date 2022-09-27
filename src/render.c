@@ -11,7 +11,6 @@
 int w_width = 1000;
 int w_height = 800;
 int panel_width = 200;
-int panel_height = 100;
 
 void render_rays(SDL_Event *event, SDL_Renderer *rend, void *param)
 {
@@ -61,7 +60,7 @@ void render_rect(SDL_Renderer *rend, SDL_drawing drawing)
 }
 void render_edge(SDL_Renderer *renderer, SDL_drawing drawing)
 {
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+        SDL_SetRenderDrawColor(renderer, 0, 255, 255, 255);
         SDL_RenderDrawLine(renderer,
                            drawing.edge.vertex_1.x,
                            drawing.edge.vertex_1.y,
@@ -78,7 +77,7 @@ static void draw_control_point(SDL_Renderer *renderer)
                                          current_point->point.y - points_w_h/2,
                                          points_w_h,
                                          points_w_h};
-                SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+                SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
                 SDL_RenderDrawRect(renderer, &point_symbol);
                 SDL_RenderFillRect(renderer, &point_symbol);
                 current_point = current_point->next;
@@ -104,7 +103,7 @@ void render_curves(SDL_Renderer *renderer)
                                    point_before->point.y - points_w_h/2,
                                    points_w_h,
                                    points_w_h};
-                SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+                SDL_SetRenderDrawColor(renderer, 0, 255, 255, 255);
                 SDL_RenderDrawRect(renderer, &point_symbol);
                 SDL_RenderFillRect(renderer, &point_symbol);
                 current_point = current_point->next;
@@ -146,4 +145,5 @@ void render_text(SDL_Renderer *renderer)
         }
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderDrawRect(renderer, &selector);
+        SDL_RenderFillRect(renderer, &selector);
 }
