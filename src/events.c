@@ -17,6 +17,7 @@ static SDL_button *current_button = NULL;
 SDL_linked_event *chain_events    = NULL;
 bool first_button_down            = true;
 static SDL_FPoint start_point;
+SDL_FPoint switch_point;
 SDL_Rect selector;
 
 /*--------------- CALLBACKS ---------------------*/
@@ -74,16 +75,28 @@ static void add_control_point_to_list(SDL_FPoint point)
         new_point->next = chain_control_points;
         *first_point = new_point;
 }
-
-static SDL_FPoint update_control_points()
+static void update_control_points()
 {
-        SDL_FPoint computed_point = affine_ratio(2, control_points[2], -1, control_points[3]);
-        SDL_FPoint temp_point = control_points[3];
-        control_points[3] = control_points[2];
+        switch_point = mouse_pos;
+        SDL_FPoint computed_point = affine_ratio(2, control_points[3], -1, switch_point);
         control_points[2] = computed_point;
+}
 
-        add_control_point_to_list(control_points[0]);
-        return temp_point;
+static void move_curve_callback(SDL_Event *event, SDL_Renderer *renderer, void *param)
+{
+        update_control_points();
+        smooth_bezier_curve(renderer, (SDL_linked_tab *)param);
+}
+
+static void release_move_curve_callback(SDL_Event *event, SDL_Renderer *renderer, void *param)
+{
+        update_control_points();
+        smooth_bezier_curve(renderer, (SDL_linked_tab *) param);
+        control_points[0] = control_points[3];
+        control_points[1] = switch_point;
+        unbind_event(SDL_MOUSEMOTION, move_curve_callback, param);
+        unbind_event(SDL_MOUSEBUTTONUP, release_move_curve_callback, param);
+
 }
 
 void curves_callback(SDL_Event *event, SDL_Renderer *renderer, void *param)
@@ -94,12 +107,14 @@ void curves_callback(SDL_Event *event, SDL_Renderer *renderer, void *param)
         nb_control_points++;
         if (nb_control_points == 4)
         {
-                SDL_FPoint temp_point = update_control_points();
-                smooth_bezier_curve(renderer);
-                nb_control_points = 2;
-                control_points[0] = control_points[3];
                 add_control_point_to_list(control_points[0]);
-                control_points[1] = temp_point;
+                add_control_point_to_list(control_points[2]);
+                control_points[3] = control_points[2];
+                SDL_linked_tab *new_bezier = create_bezier_tab(); //creating a new bézier curve
+                add_tab_to_spline(new_bezier); //adding the bézier to the others
+                bind_event(SDL_MOUSEMOTION, move_curve_callback, new_bezier);
+                bind_event(SDL_MOUSEBUTTONUP, release_move_curve_callback, new_bezier);
+                nb_control_points = 2;
         }
         return;
 }
@@ -236,6 +251,7 @@ void unbind_event(SDL_EventType event_type, SDL_callback callback, void *param)
         }
 
         chain_events = sentinel_event.next;
+
 
 
 }

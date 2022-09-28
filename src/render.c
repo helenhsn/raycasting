@@ -11,6 +11,8 @@
 int w_width = 1000;
 int w_height = 800;
 int panel_width = 200;
+int points_w_h = 10;
+
 
 void render_rays(SDL_Event *event, SDL_Renderer *rend, void *param)
 {
@@ -67,7 +69,7 @@ void render_edge(SDL_Renderer *renderer, SDL_drawing drawing)
                            drawing.edge.vertex_2.x,
                            drawing.edge.vertex_2.y);
 }
-static void draw_control_point(SDL_Renderer *renderer)
+static void draw_static_control_point(SDL_Renderer *renderer)
 {
         int points_w_h = 10;
         SDL_linked_FPoint *current_point = chain_control_points;
@@ -84,32 +86,56 @@ static void draw_control_point(SDL_Renderer *renderer)
         }
 }
 
+static void draw_var_control_points(SDL_Renderer *renderer)
+{
+        SDL_Rect point_symbol = {switch_point.x - points_w_h/2,
+                                 switch_point.y - points_w_h/2,
+                                 points_w_h,
+                                 points_w_h};
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL_RenderDrawRect(renderer, &point_symbol);
+        SDL_RenderFillRect(renderer, &point_symbol);
+
+        point_symbol.x = control_points[2].x- points_w_h/2;
+        point_symbol.y = control_points[2].y- points_w_h/2;
+        SDL_RenderDrawRect(renderer, &point_symbol);
+        SDL_RenderFillRect(renderer, &point_symbol);
+}
+
 void render_curves(SDL_Renderer *renderer)
 {
-        if (!bezier_smoothed_values)
+        if (!splines)
                 return;
         int points_w_h = 4;
-        SDL_linked_FPoint *point_before = bezier_smoothed_values;
-        SDL_linked_FPoint *current_point = point_before->next;
-        while (current_point)
+
+        fprintf(stderr, "\n\n");
+        SDL_linked_tab *current_bezier = splines;
+        while(current_bezier)
         {
-                SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-                SDL_RenderDrawLineF(renderer,
-                                    point_before->point.x,
-                                    point_before->point.y,
-                                    current_point->point.x,
-                                    current_point->point.y);
-                SDL_Rect point_symbol = {point_before->point.x - points_w_h/2,
-                                   point_before->point.y - points_w_h/2,
-                                   points_w_h,
-                                   points_w_h};
-                SDL_SetRenderDrawColor(renderer, 0, 255, 255, 255);
-                SDL_RenderDrawRect(renderer, &point_symbol);
-                SDL_RenderFillRect(renderer, &point_symbol);
-                current_point = current_point->next;
-                point_before = point_before->next;
+                SDL_FPoint *current_tab_bezier = (current_bezier->tab);
+                uint32_t last_i = 0;
+                for(uint32_t current_i = 1; current_i<nb_values; current_i++)
+                {
+                        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+                        SDL_RenderDrawLineF(renderer,
+                                            current_tab_bezier[last_i].x,
+                                            current_tab_bezier[last_i].y,
+                                            current_tab_bezier[current_i].x,
+                                            current_tab_bezier[current_i].y);
+                        SDL_Rect point_symbol = {current_tab_bezier[last_i].x - points_w_h/2,
+                                                 current_tab_bezier[last_i].y - points_w_h/2,
+                                                 points_w_h,
+                                                 points_w_h};
+                        SDL_SetRenderDrawColor(renderer, 0, 255, 255, 255);
+                        SDL_RenderDrawRect(renderer, &point_symbol);
+                        SDL_RenderFillRect(renderer, &point_symbol);
+                        last_i++;
+                }
+                current_bezier = current_bezier->next;
         }
-        draw_control_point(renderer);
+
+        draw_static_control_point(renderer);
+        draw_var_control_points(renderer);
 }
 
 void render_objects(SDL_Renderer *renderer) // draw all objects (edges or rects) onto the screen
