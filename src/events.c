@@ -16,6 +16,7 @@
 static SDL_button *current_button = NULL;
 SDL_linked_event *chain_events    = NULL;
 bool first_button_down            = true;
+static int last_id;
 static SDL_FPoint start_point;
 SDL_FPoint switch_point;
 SDL_Rect selector;
@@ -36,13 +37,18 @@ static void update_current_button(SDL_Event *event, SDL_Renderer *renderer, void
         current_button->sunken = true;
         switch (button->id) {
                 case 1: case 5:
+                        if (last_id ==4)
+                                free(control_points);
                         button->callback(event, renderer, button);
                         break;
                 case 4:
+                        nb_control_points = 0;
                         create_tab_control_points();
                         bind_event(SDL_MOUSEBUTTONDOWN, button->callback, button);
                         break;
                 default:
+                        if (last_id == 4)
+                                free(control_points);
                         bind_event(SDL_MOUSEBUTTONDOWN, button->callback, button);
         }
 
@@ -92,6 +98,7 @@ static void release_move_curve_callback(SDL_Event *event, SDL_Renderer *renderer
 {
         update_control_points();
         smooth_bezier_curve(renderer, (SDL_linked_tab *) param);
+        add_final_control_points((SDL_linked_tab *) param);
         control_points[0] = control_points[3];
         control_points[1] = switch_point;
         unbind_event(SDL_MOUSEMOTION, move_curve_callback, param);
@@ -104,11 +111,10 @@ void curves_callback(SDL_Event *event, SDL_Renderer *renderer, void *param)
         if (is_mouse_in_panel())
                 return;
         control_points[nb_control_points] = mouse_pos;
+        add_control_point_to_list(control_points[nb_control_points]);
         nb_control_points++;
         if (nb_control_points == 4)
         {
-                add_control_point_to_list(control_points[0]);
-                add_control_point_to_list(control_points[2]);
                 control_points[3] = control_points[2];
                 SDL_linked_tab *new_bezier = create_bezier_tab(); //creating a new bézier curve
                 add_tab_to_spline(new_bezier); //adding the bézier to the others
@@ -162,7 +168,7 @@ void callback_release(SDL_Event *event, SDL_Renderer *renderer, void *param)
 
 void button_panel_callback(SDL_Event *event, SDL_Renderer *renderer, void *param)
 {
-        SDL_Log("Mouse button is pressed at %f %f", mouse_pos.x, mouse_pos.y);
+        //SDL_Log("Mouse button is pressed at %f %f", mouse_pos.x, mouse_pos.y);
 
         if (!is_mouse_in_panel())
                 return;
@@ -176,18 +182,14 @@ void button_panel_callback(SDL_Event *event, SDL_Renderer *renderer, void *param
         }
         if (current_frame &&(!current_frame->button.sunken))
         {
+                last_id = current_frame->button.id;
                 if (!current_button)
                         update_current_button(event, renderer, param, &current_frame->button);
+
                 else if (current_frame->button.id != current_button->id) //change drawings
                 {
                         cancel_current_button();
                         update_current_button(event, renderer, param,&current_frame->button);
-                }
-                else { // cancel current drawing
-                        cancel_current_button();
-                        current_button = NULL;
-                        current_frame->button.sunken = false;
-
                 }
         }
 }
@@ -195,8 +197,7 @@ void button_panel_callback(SDL_Event *event, SDL_Renderer *renderer, void *param
 
 void quit_callback(SDL_Event *event, SDL_Renderer *renderer, void *param)
 {
-    SDL_Scancode key_pressed = (*event).key.keysym.scancode;
-    if (key_pressed == SDL_SCANCODE_ESCAPE)
+    if ((*event).window.event == SDL_WINDOWEVENT_CLOSE)
         QUIT = true;
 }
 

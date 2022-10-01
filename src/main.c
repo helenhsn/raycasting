@@ -111,7 +111,7 @@ int main()
 
         //bind initial events
         bind_event(SDL_MOUSEBUTTONDOWN, button_panel_callback, NULL);
-        bind_event(SDL_KEYDOWN, quit_callback, NULL);
+        bind_event(SDL_WINDOWEVENT, quit_callback, NULL);
 
         //initialize drawing chain with the window's edges
         init_drawing(renderer);

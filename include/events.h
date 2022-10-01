@@ -33,7 +33,6 @@ extern bool QUIT;
 extern bool first_button_down;
 extern SDL_linked_event *chain_events;
 extern SDL_Rect selector;
-extern SDL_linked_FPoint *chain_control_points;
 extern SDL_FPoint switch_point;
 /*
  * Functions & callbacks used for events handling

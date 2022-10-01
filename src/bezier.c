@@ -11,6 +11,7 @@ SDL_FPoint *control_points = NULL;
 SDL_linked_tab *splines = NULL;
 SDL_linked_FPoint *chain_control_points = NULL;
 int nb_control_points = 0;
+int nb_beziers = 0;
 
 static int factorial(int n)
 {
@@ -34,8 +35,10 @@ inline float distance(SDL_FPoint *pt1, SDL_FPoint *pt2)
         return (pt1->x-pt2->x)*(pt1->x-pt2->x) + (pt1->y - pt2->y)*(pt1->y - pt2->y);
 }
 
-static void compute_bezier_point(float time, SDL_FPoint *result)
+void compute_bezier_point(float time, SDL_FPoint *result, SDL_FPoint *control_points)
 {
+        result->x = 0;
+        result->y = 0;
         for (uint8_t i=0; i<4; i++)
         {
                 result->x += bernstein_polynomial(time, i, 3)*control_points[i].x;
@@ -59,9 +62,7 @@ void cubic_bezier_curve(SDL_bezier_FPoint *bezier_values)
 
         while(k < nb_values)
         {
-                bezier_values[k].point.x = 0;
-                bezier_values[k].point.y = 0;
-                compute_bezier_point(t_k, &bezier_values[k].point);
+                compute_bezier_point(t_k, &bezier_values[k].point, control_points);
                 if (k!=0)
                         distance_from_start += sqrtf(distance(&bezier_values[k].point, &bezier_values[k-1].point));
                 bezier_values[k].distance = distance_from_start;
@@ -102,7 +103,7 @@ static SDL_FPoint new_point_equidistant(SDL_bezier_FPoint *bezier_not_smoothed, 
         SDL_FPoint result_point={0,0};
         //binary search followed by linear interpolation to find the index t so that the arc length in P(t) = point_distance
         float t = larger_dist_smaller(bezier_not_smoothed, point_distance) / ((float) nb_values - 1);
-        compute_bezier_point( t, &result_point);
+        compute_bezier_point( t, &result_point, control_points);
         return result_point;
 }
 
@@ -133,12 +134,14 @@ void smooth_bezier_curve(SDL_Renderer *renderer, SDL_linked_tab *new_bezier_tab)
 void add_tab_to_spline(SDL_linked_tab *new_bezier_tab)
 {
         SDL_linked_tab **first_tab = &splines;
-        /*
-        SDL_linked_tab *new_bezier = malloc(sizeof(SDL_linked_tab));
-        new_bezier->tab = &new_bezier_tab;
-        new_bezier->next = splines;*/
+        new_bezier_tab->id = nb_beziers;
         new_bezier_tab->next = splines;
         *first_tab = new_bezier_tab;
+        nb_beziers++;
+}
+void add_final_control_points(SDL_linked_tab *bezier_tab) {
+        for (uint8_t i=0; i<4; i++)
+                bezier_tab->control_pts[i] = control_points[i];
 }
 
 
@@ -146,14 +149,16 @@ SDL_linked_tab *create_bezier_tab()
 {
         SDL_linked_tab *bezier_tab = malloc(sizeof(SDL_linked_tab));
         bezier_tab->tab = calloc(nb_values, sizeof(SDL_FPoint));
+        bezier_tab->control_pts = calloc(4, sizeof(SDL_FPoint));
         bezier_tab->next = NULL;
         return bezier_tab;
 }
-
 void create_tab_control_points()
 {
         control_points = calloc(4, sizeof(SDL_FPoint));
 }
+
+
 
 void free_curves()
 {
@@ -177,6 +182,7 @@ void free_curves()
                 SDL_linked_tab *bezier_to_free = current_bezier;
                 current_bezier = current_bezier->next;
                 free(bezier_to_free->tab);
+                free(bezier_to_free->control_pts);
                 free(bezier_to_free);
         }
         splines=NULL;

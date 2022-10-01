@@ -20,7 +20,9 @@ typedef struct SDL_linked_FPoint
 
 typedef struct SDL_linked_tab
 {
+    int id;
     SDL_FPoint *tab;
+    SDL_FPoint *control_pts;
     struct SDL_linked_tab *next;
 } SDL_linked_tab;
 
@@ -29,8 +31,11 @@ extern SDL_linked_tab *splines;
 extern SDL_linked_FPoint *chain_control_points;
 extern int nb_control_points;
 extern const int nb_values;
+extern int nb_beziers;
 
 extern float distance(SDL_FPoint *pt1, SDL_FPoint *pt2);
+
+extern void compute_bezier_point(float time, SDL_FPoint *result, SDL_FPoint *control_points);
 
 extern void smooth_bezier_curve(SDL_Renderer  *renderer, SDL_linked_tab *new_bezier_tab);
 
@@ -41,4 +46,6 @@ extern SDL_linked_tab *create_bezier_tab();
 extern void create_tab_control_points();
 
 extern void add_tab_to_spline(SDL_linked_tab *new_bezier_tab);
+
+extern void add_final_control_points(SDL_linked_tab *bezier_tab);
 #endif //RAYCASTING_BEZIER_H

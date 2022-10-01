@@ -7,6 +7,7 @@
 #include "geometry.h"
 #include "commands.h"
 #include "bezier.h"
+#include "intersection.h"
 
 int w_width = 1000;
 int w_height = 800;
@@ -24,30 +25,17 @@ void render_rays(SDL_Event *event, SDL_Renderer *rend, void *param)
                 rays_array[i].start_point.y = mouse_pos.y;
                 rays_array[i].end_point.x = mouse_pos.x + cos(-i*2*M_PI/nb_ray);
                 rays_array[i].end_point.y = mouse_pos.y + sin(-i*2*M_PI/nb_ray);
-                SDL_FPoint last_endpoint = {-1,-1};
-                SDL_FPoint intersect_pt = {-2, -2};
-                SDL_linked_drawing *current_edge = chain_drawings;
 
-                while (current_edge)
-                {
-                        if (is_ray_intersect_edge(&intersect_pt, current_edge->drawing.edge, rays_array[i]))
-                        {
-                                if ( (last_endpoint.x == -1 && last_endpoint.y == -1) || distance(&mouse_pos, &intersect_pt) < distance(&mouse_pos, &last_endpoint))
-                                {
-                                        last_endpoint.x = intersect_pt.x;
-                                        last_endpoint.y = intersect_pt.y;
-                                }
-                        }
-
-                        current_edge = current_edge->next;
-                }
-                //draw the endpoint with the smallest distance from the mouse (the other ones are stopped by the edge)
+                SDL_FPoint last_endpoint = {50,50};
+                draw_intersection_ray_edges(rend, rays_array[i], &last_endpoint);
+                draw_intersection_ray_curve(rend, rays_array[i], &last_endpoint);
                 SDL_SetRenderDrawColor(rend, 255, 255, 255, 255);
                 SDL_RenderDrawLine(rend,
                                    rays_array[i].start_point.x,
                                    rays_array[i].start_point.y,
                                    last_endpoint.x,
                                    last_endpoint.y);
+
 
         }
 
@@ -106,9 +94,6 @@ void render_curves(SDL_Renderer *renderer)
 {
         if (!splines)
                 return;
-        int points_w_h = 4;
-
-        fprintf(stderr, "\n\n");
         SDL_linked_tab *current_bezier = splines;
         while(current_bezier)
         {
@@ -116,25 +101,16 @@ void render_curves(SDL_Renderer *renderer)
                 uint32_t last_i = 0;
                 for(uint32_t current_i = 1; current_i<nb_values; current_i++)
                 {
-                        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+                        SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
                         SDL_RenderDrawLineF(renderer,
                                             current_tab_bezier[last_i].x,
                                             current_tab_bezier[last_i].y,
                                             current_tab_bezier[current_i].x,
                                             current_tab_bezier[current_i].y);
-                        SDL_Rect point_symbol = {current_tab_bezier[last_i].x - points_w_h/2,
-                                                 current_tab_bezier[last_i].y - points_w_h/2,
-                                                 points_w_h,
-                                                 points_w_h};
-                        SDL_SetRenderDrawColor(renderer, 0, 255, 255, 255);
-                        SDL_RenderDrawRect(renderer, &point_symbol);
-                        SDL_RenderFillRect(renderer, &point_symbol);
                         last_i++;
                 }
                 current_bezier = current_bezier->next;
         }
-
-        draw_static_control_point(renderer);
         draw_var_control_points(renderer);
 }
 

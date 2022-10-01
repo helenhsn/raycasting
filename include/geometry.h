@@ -13,12 +13,6 @@
  * Elements to display on the screen
  * */
 
-typedef struct SDL_vector2D
-{
-    float dx;
-    float dy;
-} SDL_vector2D;
-
 typedef struct SDL_edge
 {
     SDL_FPoint vertex_1;
@@ -63,19 +57,17 @@ extern SDL_FPoint affine_ratio(float a, SDL_FPoint pt1, float b, SDL_FPoint pt2)
 
 extern bool is_point_in_rect(SDL_Rect rect, SDL_FPoint point);
 
+extern float dot_product(SDL_FPoint a, SDL_FPoint b);
+
 extern float distance(SDL_FPoint *pt1, SDL_FPoint *pt2);
 
 extern void init_rays();
 
 extern void init_drawing(SDL_Renderer *renderer);
 
-extern bool is_ray_intersect_edge(SDL_FPoint *intersection, SDL_edge edge, SDL_ray ray);
-
 extern void add_rect_to_list(SDL_Event *event, SDL_Renderer *renderer, void *user_param);
 
 extern void add_edge_to_list(SDL_Event *event, SDL_Renderer *renderer, void *user_param);
-
-extern void add_point_to_list(SDL_Event *event, SDL_Renderer *renderer, void *user_param);
 
 extern void free_chain_drawings();
 

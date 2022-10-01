@@ -51,42 +51,49 @@ build cmake_object_order_depends_target_raycasting: phony || CMakeFiles/raycasti
 
 build CMakeFiles/raycasting.dir/src/bezier.c.o: C_COMPILER__raycasting_Debug /home/helen/Documents/GIT/raycasting/src/bezier.c || cmake_object_order_depends_target_raycasting
   DEP_FILE = CMakeFiles/raycasting.dir/src/bezier.c.o.d
-  FLAGS = -g -std=gnu99
+  FLAGS = -g   -fno-stack-protector -std=gnu99
   INCLUDES = -I/home/helen/Documents/GIT/raycasting/include -I/usr/include/SDL2
   OBJECT_DIR = CMakeFiles/raycasting.dir
   OBJECT_FILE_DIR = CMakeFiles/raycasting.dir/src
 
 build CMakeFiles/raycasting.dir/src/commands.c.o: C_COMPILER__raycasting_Debug /home/helen/Documents/GIT/raycasting/src/commands.c || cmake_object_order_depends_target_raycasting
   DEP_FILE = CMakeFiles/raycasting.dir/src/commands.c.o.d
-  FLAGS = -g -std=gnu99
+  FLAGS = -g   -fno-stack-protector -std=gnu99
   INCLUDES = -I/home/helen/Documents/GIT/raycasting/include -I/usr/include/SDL2
   OBJECT_DIR = CMakeFiles/raycasting.dir
   OBJECT_FILE_DIR = CMakeFiles/raycasting.dir/src
 
 build CMakeFiles/raycasting.dir/src/events.c.o: C_COMPILER__raycasting_Debug /home/helen/Documents/GIT/raycasting/src/events.c || cmake_object_order_depends_target_raycasting
   DEP_FILE = CMakeFiles/raycasting.dir/src/events.c.o.d
-  FLAGS = -g -std=gnu99
+  FLAGS = -g   -fno-stack-protector -std=gnu99
   INCLUDES = -I/home/helen/Documents/GIT/raycasting/include -I/usr/include/SDL2
   OBJECT_DIR = CMakeFiles/raycasting.dir
   OBJECT_FILE_DIR = CMakeFiles/raycasting.dir/src
 
 build CMakeFiles/raycasting.dir/src/geometry.c.o: C_COMPILER__raycasting_Debug /home/helen/Documents/GIT/raycasting/src/geometry.c || cmake_object_order_depends_target_raycasting
   DEP_FILE = CMakeFiles/raycasting.dir/src/geometry.c.o.d
-  FLAGS = -g -std=gnu99
+  FLAGS = -g   -fno-stack-protector -std=gnu99
+  INCLUDES = -I/home/helen/Documents/GIT/raycasting/include -I/usr/include/SDL2
+  OBJECT_DIR = CMakeFiles/raycasting.dir
+  OBJECT_FILE_DIR = CMakeFiles/raycasting.dir/src
+
+build CMakeFiles/raycasting.dir/src/intersection.c.o: C_COMPILER__raycasting_Debug /home/helen/Documents/GIT/raycasting/src/intersection.c || cmake_object_order_depends_target_raycasting
+  DEP_FILE = CMakeFiles/raycasting.dir/src/intersection.c.o.d
+  FLAGS = -g   -fno-stack-protector -std=gnu99
   INCLUDES = -I/home/helen/Documents/GIT/raycasting/include -I/usr/include/SDL2
   OBJECT_DIR = CMakeFiles/raycasting.dir
   OBJECT_FILE_DIR = CMakeFiles/raycasting.dir/src
 
 build CMakeFiles/raycasting.dir/src/main.c.o: C_COMPILER__raycasting_Debug /home/helen/Documents/GIT/raycasting/src/main.c || cmake_object_order_depends_target_raycasting
   DEP_FILE = CMakeFiles/raycasting.dir/src/main.c.o.d
-  FLAGS = -g -std=gnu99
+  FLAGS = -g   -fno-stack-protector -std=gnu99
   INCLUDES = -I/home/helen/Documents/GIT/raycasting/include -I/usr/include/SDL2
   OBJECT_DIR = CMakeFiles/raycasting.dir
   OBJECT_FILE_DIR = CMakeFiles/raycasting.dir/src
 
 build CMakeFiles/raycasting.dir/src/render.c.o: C_COMPILER__raycasting_Debug /home/helen/Documents/GIT/raycasting/src/render.c || cmake_object_order_depends_target_raycasting
   DEP_FILE = CMakeFiles/raycasting.dir/src/render.c.o.d
-  FLAGS = -g -std=gnu99
+  FLAGS = -g   -fno-stack-protector -std=gnu99
   INCLUDES = -I/home/helen/Documents/GIT/raycasting/include -I/usr/include/SDL2
   OBJECT_DIR = CMakeFiles/raycasting.dir
   OBJECT_FILE_DIR = CMakeFiles/raycasting.dir/src
@@ -99,9 +106,9 @@ build CMakeFiles/raycasting.dir/src/render.c.o: C_COMPILER__raycasting_Debug /ho
 #############################################
 # Link the executable raycasting
 
-build raycasting: C_EXECUTABLE_LINKER__raycasting_Debug CMakeFiles/raycasting.dir/src/bezier.c.o CMakeFiles/raycasting.dir/src/commands.c.o CMakeFiles/raycasting.dir/src/events.c.o CMakeFiles/raycasting.dir/src/geometry.c.o CMakeFiles/raycasting.dir/src/main.c.o CMakeFiles/raycasting.dir/src/render.c.o
+build raycasting: C_EXECUTABLE_LINKER__raycasting_Debug CMakeFiles/raycasting.dir/src/bezier.c.o CMakeFiles/raycasting.dir/src/commands.c.o CMakeFiles/raycasting.dir/src/events.c.o CMakeFiles/raycasting.dir/src/geometry.c.o CMakeFiles/raycasting.dir/src/intersection.c.o CMakeFiles/raycasting.dir/src/main.c.o CMakeFiles/raycasting.dir/src/render.c.o
   FLAGS = -g
-  LINK_LIBRARIES = -lSDL2  -lSDL2_ttf  -lm
+  LINK_LIBRARIES = -lSDL2  -lSDL2_ttf  -lgsl  -lm
   OBJECT_DIR = CMakeFiles/raycasting.dir
   POST_BUILD = :
   PRE_LINK = :
