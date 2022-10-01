@@ -37,17 +37,17 @@ static void update_current_button(SDL_Event *event, SDL_Renderer *renderer, void
         current_button->sunken = true;
         switch (button->id) {
                 case 1: case 5:
-                        if (last_id ==4)
+                        if (last_id ==3)
                                 free(control_points);
                         button->callback(event, renderer, button);
                         break;
-                case 4:
+                case 3:
                         nb_control_points = 0;
                         create_tab_control_points();
                         bind_event(SDL_MOUSEBUTTONDOWN, button->callback, button);
                         break;
                 default:
-                        if (last_id == 4)
+                        if (last_id == 3)
                                 free(control_points);
                         bind_event(SDL_MOUSEBUTTONDOWN, button->callback, button);
         }
@@ -73,14 +73,6 @@ void clear_callback(SDL_Event *event, SDL_Renderer *renderer, void *param)
         current_button = NULL;
 }
 
-static void add_control_point_to_list(SDL_FPoint point)
-{
-        SDL_linked_FPoint **first_point = &chain_control_points;
-        SDL_linked_FPoint *new_point = malloc(sizeof(SDL_linked_FPoint));
-        new_point->point = point;
-        new_point->next = chain_control_points;
-        *first_point = new_point;
-}
 static void update_control_points()
 {
         switch_point = mouse_pos;
@@ -111,9 +103,9 @@ void curves_callback(SDL_Event *event, SDL_Renderer *renderer, void *param)
         if (is_mouse_in_panel())
                 return;
         control_points[nb_control_points] = mouse_pos;
-        add_control_point_to_list(control_points[nb_control_points]);
         nb_control_points++;
-        if (nb_control_points == 4)
+
+        if (nb_control_points == 4) //end of the cubic bézier
         {
                 control_points[3] = control_points[2];
                 SDL_linked_tab *new_bezier = create_bezier_tab(); //creating a new bézier curve
@@ -168,8 +160,6 @@ void callback_release(SDL_Event *event, SDL_Renderer *renderer, void *param)
 
 void button_panel_callback(SDL_Event *event, SDL_Renderer *renderer, void *param)
 {
-        //SDL_Log("Mouse button is pressed at %f %f", mouse_pos.x, mouse_pos.y);
-
         if (!is_mouse_in_panel())
                 return;
 
@@ -250,11 +240,7 @@ void unbind_event(SDL_EventType event_type, SDL_callback callback, void *param)
                 free(*ptr_event_to_free);
                 *ptr_event_to_free = NULL;
         }
-
         chain_events = sentinel_event.next;
-
-
-
 }
 
 void handle_event(SDL_Event event, SDL_Renderer *rend)

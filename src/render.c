@@ -35,8 +35,6 @@ void render_rays(SDL_Event *event, SDL_Renderer *rend, void *param)
                                    rays_array[i].start_point.y,
                                    last_endpoint.x,
                                    last_endpoint.y);
-
-
         }
 
 
@@ -57,20 +55,18 @@ void render_edge(SDL_Renderer *renderer, SDL_drawing drawing)
                            drawing.edge.vertex_2.x,
                            drawing.edge.vertex_2.y);
 }
-static void draw_static_control_point(SDL_Renderer *renderer)
+static void draw_static_control_points(SDL_Renderer *renderer)
 {
         int points_w_h = 10;
-        SDL_linked_FPoint *current_point = chain_control_points;
-        while (current_point)
+        for (uint8_t i=0; i<nb_control_points; i++)
         {
-                SDL_Rect point_symbol = {current_point->point.x - points_w_h/2,
-                                         current_point->point.y - points_w_h/2,
+                SDL_Rect point_symbol = {control_points[i].x - points_w_h/2,
+                                         control_points[i].y - points_w_h/2,
                                          points_w_h,
                                          points_w_h};
                 SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
                 SDL_RenderDrawRect(renderer, &point_symbol);
                 SDL_RenderFillRect(renderer, &point_symbol);
-                current_point = current_point->next;
         }
 }
 
@@ -92,8 +88,11 @@ static void draw_var_control_points(SDL_Renderer *renderer)
 
 void render_curves(SDL_Renderer *renderer)
 {
-        if (!splines)
+        if (control_points)
+                draw_static_control_points(renderer);
+        if (!splines) {
                 return;
+        }
         SDL_linked_tab *current_bezier = splines;
         while(current_bezier)
         {

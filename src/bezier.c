@@ -9,7 +9,6 @@ static const float step = 0.01;
 const int nb_values = (int) 1/step + 1;
 SDL_FPoint *control_points = NULL;
 SDL_linked_tab *splines = NULL;
-SDL_linked_FPoint *chain_control_points = NULL;
 int nb_control_points = 0;
 int nb_beziers = 0;
 
