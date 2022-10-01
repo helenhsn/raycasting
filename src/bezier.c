@@ -164,14 +164,6 @@ void free_curves()
         //cleaning control_points
         free(control_points);
 
-        SDL_linked_FPoint  *current_point = chain_control_points;
-        while (current_point)
-        {
-                SDL_linked_FPoint *point_to_free = current_point;
-                current_point = current_point->next;
-                free(point_to_free);
-        }
-        chain_control_points = NULL;
         nb_control_points = 0;
 
         //cleaning splines

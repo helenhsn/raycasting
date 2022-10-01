@@ -57,7 +57,6 @@ void render_edge(SDL_Renderer *renderer, SDL_drawing drawing)
 }
 static void draw_static_control_points(SDL_Renderer *renderer)
 {
-        int points_w_h = 10;
         for (uint8_t i=0; i<nb_control_points; i++)
         {
                 SDL_Rect point_symbol = {control_points[i].x - points_w_h/2,
