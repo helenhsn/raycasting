@@ -103,7 +103,7 @@ static bool is_ray_intersect_edge(SDL_FPoint *intersection, SDL_edge edge, SDL_r
 void draw_intersection_ray_edges(SDL_Renderer *renderer, SDL_ray ray, SDL_FPoint *last_endpoint)
 {
         SDL_FPoint intersect_pt = {-2, -2};
-        SDL_linked_drawing *current_edge = chain_drawings;
+        SDL_linked_drawing *current_edge = chain_objects;
 
         while (current_edge)
         {

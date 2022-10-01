@@ -116,7 +116,7 @@ void render_curves(SDL_Renderer *renderer)
 
 void render_objects(SDL_Renderer *renderer) // draw all objects (edges or rects) onto the screen
 {
-        SDL_linked_drawing *current_drawing = chain_drawings;
+        SDL_linked_drawing *current_drawing = chain_objects;
         while (current_drawing)
         {
                 current_drawing->renderfunc(renderer, current_drawing->drawing);

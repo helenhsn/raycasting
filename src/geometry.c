@@ -6,7 +6,7 @@
 #include "render.h"
 
 SDL_FPoint mouse_pos;
-SDL_linked_drawing *chain_drawings          = NULL;
+SDL_linked_drawing *chain_objects          = NULL;
 static int rect_size                            = 5;
 SDL_ray *rays_array = NULL;
 int nb_ray = 200;
@@ -58,22 +58,22 @@ void add_rect_to_list(SDL_Event *event, SDL_Renderer *renderer, void *user_param
         if (mouse_pos.x + rect_size/2 > w_width - panel_width)
                 return;
         SDL_Rect new_rect           = {mouse_pos.x - rect_size/2, mouse_pos.y - rect_size/2, rect_size, rect_size};
-        SDL_linked_drawing **first_drawing     = &chain_drawings;
+        SDL_linked_drawing **first_drawing     = &chain_objects;
         SDL_linked_drawing *drawing_to_add     = malloc(sizeof(SDL_linked_drawing));
         drawing_to_add->drawing.rect = new_rect;
         drawing_to_add->renderfunc = render_rect;
-        drawing_to_add->next        = chain_drawings;
+        drawing_to_add->next        = chain_objects;
         *first_drawing = drawing_to_add;
 
 }
 
 void add_edge_to_list(SDL_Event *event, SDL_Renderer *renderer, void *user_param)
 {
-        SDL_linked_drawing **first_drawing = &chain_drawings;
+        SDL_linked_drawing **first_drawing = &chain_objects;
         SDL_linked_drawing  *drawing_to_add = malloc(sizeof(SDL_linked_drawing));
         drawing_to_add->drawing.edge = * ((SDL_edge *)user_param);
         drawing_to_add->renderfunc = render_edge;
-        drawing_to_add->next = chain_drawings;
+        drawing_to_add->next = chain_objects;
         *first_drawing = drawing_to_add;
 
         first_button_down = true;
@@ -84,18 +84,18 @@ void add_edge_to_list(SDL_Event *event, SDL_Renderer *renderer, void *user_param
 
 /*-------------- OTHERS ------------------*/
 
-void free_chain_drawings()
+void free_chain_objects()
 {
 
         //free rects & edges
-        SDL_linked_drawing *current_drawing = chain_drawings;
+        SDL_linked_drawing *current_drawing = chain_objects;
         while (current_drawing)
         {
                 SDL_linked_drawing *drawing_to_free = current_drawing;
                 current_drawing = current_drawing->next;
                 free(drawing_to_free);
         }
-        chain_drawings = NULL;
+        chain_objects = NULL;
 
         //free rays
         free(rays_array);

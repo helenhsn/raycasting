@@ -102,9 +102,9 @@ void init_command_panel(SDL_Renderer *renderer)
         //button casting rays
         frame_info button_strings[] = {{1, rays_callback, "CAST RAYS"},
                                   {2, edges_callback, "EDGES"},
-                                  {3, rects_callback, "RECTANGLES"},
-                                  {4, curves_callback, "CURVES"},
-                                  {5, clear_callback, "CLEAR DRAWINGS"}};
+                                  {3, curves_callback, "CURVES"},
+                                  {4, rects_callback, "DRAW"},
+                                  {5, clear_callback, "CLEAR OBJECTS"}};
 
         for (uint8_t i=0; i<5; i++)
                 add_to_text_list(renderer, button_strings[i], text_color, button_color, true);

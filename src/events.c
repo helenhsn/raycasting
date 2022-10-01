@@ -60,7 +60,7 @@ static void update_current_button(SDL_Event *event, SDL_Renderer *renderer, void
 }
 void free_all_objects()
 {
-        free_chain_drawings();
+        free_chain_objects();
         free_curves();
 }
 void clear_callback(SDL_Event *event, SDL_Renderer *renderer, void *param)
