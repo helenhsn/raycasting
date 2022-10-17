@@ -2,7 +2,7 @@
 
 Small raycaster in C, allowing the user to cast light on edges and curves.
 
-The user can draw curves by placing points on the screen. Each fragment of curve is modelled by a Cubic Bézier curve which is connecter with one another by a C^2 junction. 
+The user can draw curves by placing points on the screen. Each fragment of curve is modelled by a Cubic Bézier curve which is connecter with one another by a $C^2$ junction. 
 
 The user can also move the curve as he wants by sliding the white points.
 
