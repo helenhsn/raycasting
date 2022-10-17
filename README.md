@@ -6,6 +6,16 @@ The user can draw curves by placing points on the screen. Each fragment of curve
 
 The user can also move the curve as he wants by sliding the white points.
 
+You can see examples of this graphical interface below :
+
+
+![[raycasting_ex1|30]](https://user-images.githubusercontent.com/88513402/196152291-7ceae903-7fc3-4967-bfcd-199788bbc3cb.gif)
+
+![[raycasting_ex2|30]](https://user-images.githubusercontent.com/88513402/196152364-332361e8-9178-4187-b401-7cb8047a31b5.gif)
+
+![[raycasting_ex3]](https://user-images.githubusercontent.com/88513402/196152412-44f8b29c-1731-4577-ae70-d1a2ff57243c.gif)
+
+
 ## Prerequisites
 
 In order to compile this program, you need to install the following libraries :
